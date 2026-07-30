@@ -1,0 +1,26 @@
+# Binaries
+unvr-carousal
+unvr-carousal-pi
+unvr-carousal-pi64
+
+# Config
+~/.config/unvr-carousal/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Go
+*.exe
+*.test
+*.out
+
+# Temp
+tmp/
