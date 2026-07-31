@@ -61,6 +61,17 @@
 ### FFmpeg Path
 - Check PATH first, fallback to user-specified path in settings
 
+### Kiosk Mode
+- `--setup-kiosk` (sudo): creates `unvr-kiosk` user, configures LightDM autologin, disables TTY, creates systemd guard
+- `--undo-kiosk` (sudo): reverses all changes, removes user, restores normal boot
+- `--kiosk`: runs in kiosk mode (no decorations, prevents close)
+- Root only for setup, app runs as unprivileged kiosk user
+
+### Pi Relay
+- Pi runs FFmpeg, serves MJPEG stream over HTTP
+- Android connects to Pi's stream instead of UNVR directly
+- Offloads decoding to Pi, low Android CPU
+
 ## Doc Index
 
 | Doc | Purpose |
@@ -95,6 +106,7 @@
 - [ ] PIN pad (random buttons, shake animation)
 
 ### Phase 4: Polish
+- [ ] Kiosk mode (--setup-kiosk, --undo-kiosk, --kiosk)
 - [ ] Android scaffolding (build tags)
 - [ ] Error handling (retries, crash recovery)
 - [ ] Settings hot-reload

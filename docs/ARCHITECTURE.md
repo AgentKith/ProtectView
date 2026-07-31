@@ -63,10 +63,12 @@ UNVR ──RTSPS──▶ FFmpeg ──rawvideo──▶ Goroutine ──image.R
 - **Cons**: 5fps, choppy, higher bandwidth
 
 ### Pi Relay
-- Pi runs FFmpeg, serves MJPEG stream over HTTP
-- Android connects to Pi's stream
-- **Pros**: Offloads decoding to Pi, low Android CPU
+- Pi runs FFmpeg, serves MJPEG stream over HTTP on local network
+- Android connects to Pi's stream instead of UNVR directly
+- **Pros**: Offloads decoding to Pi, low Android CPU, single point of UNVR connection
 - **Cons**: Requires Pi running, network dependency
+- **Server**: HTTP endpoint `/stream/{camera-id}.mjpg`, MJPEG frames from FFmpeg
+- **Client**: HTTP GET, parse multipart JPEG, decode each frame
 
 ## Platform Matrix
 
@@ -104,3 +106,30 @@ UNVR ──RTSPS──▶ FFmpeg ──rawvideo──▶ Goroutine ──image.R
 - **Manual retry**: Tap tile to force reconnect
 - **FFmpeg crash**: Restart subprocess, preserve state
 - **UNVR unreachable**: Show error in all tiles, retry loop
+
+## Kiosk Mode
+
+### Setup Flow (`--setup-kiosk`, requires sudo)
+
+1. Create `unvr-kiosk` user (no shell, no login password)
+2. Configure LightDM autologin for `unvr-kiosk`
+3. Disable TTY access (`NAutoVTs=0`, `ReserveVT=0` in `logind.conf`)
+4. Create systemd service (`Restart=always`, `RestartSec=1`)
+5. Install openbox autostart (only launches `unvr-carousal --kiosk`)
+6. Drop privileges, exit
+
+### Undo Flow (`--undo-kiosk`, requires sudo)
+
+1. Stop systemd service
+2. Restore LightDM config (remove autologin)
+3. Re-enable TTY access
+4. Remove openbox autostart
+5. Remove `unvr-kiosk` user
+6. Remove systemd service
+
+### Kiosk Runtime (`--kiosk`)
+
+- No window decorations
+- Catch window close events, ignore them
+- Fullscreen only, no toggle
+- Systemd restarts on any exit

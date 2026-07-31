@@ -116,22 +116,72 @@ sudo systemctl start unvr-carousal
 
 ### Kiosk Mode
 
-For headless Pi with no desktop environment:
+Full lockdown: app is the only thing running, no TTY access, auto-restarts on exit.
+
+**Setup** (one-time, requires sudo):
 
 ```bash
-# Install minimal X11 + window manager
-sudo apt install xserver-xorg x11-xserver-utils openbox
+sudo unvr-carousal --setup-kiosk
+```
 
-# Create autostart
-mkdir -p ~/.config/openbox
-tee ~/.config/openbox/autostart << 'EOF'
-# Fullscreen, no decorations
-xrandr --output HDMI-1 --mode 1920x1080
-unvr-carousal --fullscreen --kiosk
+This creates a `unvr-kiosk` user, configures autologin, disables TTY, and sets up a systemd guard. Reboot to enter kiosk mode.
+
+**Undo** (requires sudo):
+
+```bash
+sudo unvr-carousal --undo-kiosk
+```
+
+Reverses all changes, removes kiosk user, restores normal boot.
+
+**Manual setup** (equivalent to --setup-kiosk):
+
+```bash
+# Install dependencies
+sudo apt install lightdm openbox x11-xserver-utils
+
+# Create kiosk user
+sudo useradd -m -s /usr/sbin/nologin unvr-kiosk
+
+# Configure LightDM autologin
+sudo tee /etc/lightdm/lightdm.conf.d/99-kiosk.conf << 'EOF'
+[Seat:*]
+autologin-user=unvr-kiosk
+autologin-user-timeout=0
+user-session=openbox
 EOF
 
-# Start X on boot
-@xinit -- -nocursor
+# Disable TTY
+sudo sed -i 's/NAutoVTs=.*/NAutoVTs=0/' /etc/systemd/logind.conf
+sudo sed -i 's/ReserveVT=.*/ReserveVT=0/' /etc/systemd/logind.conf
+
+# Create openbox autostart
+sudo mkdir -p /home/unvr-kiosk/.config/openbox
+sudo tee /home/unvr-kiosk/.config/openbox/autostart << 'EOF'
+xrandr --output HDMI-1 --mode 1920x1080
+unvr-carousal --kiosk
+EOF
+sudo chown -R unvr-kiosk:unvr-kiosk /home/unvr-kiosk/.config
+
+# Create systemd service
+sudo tee /etc/systemd/system/unvr-carousal.service << 'EOF'
+[Unit]
+Description=UNVR Carousal Kiosk
+After=graphical.target
+
+[Service]
+Type=simple
+User=unvr-kiosk
+ExecStart=/usr/local/bin/unvr-carousal --kiosk
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=graphical.target
+EOF
+
+sudo systemctl enable unvr-carousal
+sudo systemctl enable lightdm
 ```
 
 ## Troubleshooting

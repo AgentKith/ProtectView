@@ -85,7 +85,8 @@ On first run, generate 16 random bytes, save as hex-encoded string in `.salt` fi
     },
     "appearance": {
         "theme": "dark",
-        "fullscreen": true
+        "fullscreen": true,
+        "kiosk": false
     }
 }
 ```
@@ -140,6 +141,7 @@ On first run, generate 16 random bytes, save as hex-encoded string in `.salt` fi
 |-------|------|---------|-------------|
 | `appearance.theme` | string | `dark` | `dark` or `light` |
 | `appearance.fullscreen` | bool | `true` | Start in fullscreen mode |
+| `appearance.kiosk` | bool | `false` | Kiosk mode (no decorations, prevent close) |
 
 ## Migration
 

@@ -159,6 +159,14 @@ func renderIcon(name string, color color.Color) *canvas.Image {
 - Shake animation on wrong PIN (200ms, 3 oscillations)
 - Close: `x` button, ESC key
 
+### Kiosk Mode
+
+- No window decorations (borderless)
+- Fullscreen only, no toggle
+- Window close event is ignored (prevents quit)
+- Edge-hover menu disabled (no exit option)
+- Systemd guard restarts on any exit
+
 ## Animations
 
 ### Menu Slide-In

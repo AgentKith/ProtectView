@@ -10,6 +10,7 @@ Multi-camera security monitor for UniFi UNVR. Displays live camera feeds in a fu
 - PIN-protected settings with decoy buttons
 - Encrypted configuration (AES-256-GCM, device-bound)
 - Dark/light theme with Inter font
+- Kiosk mode (full lockdown, auto-restart, no TTY)
 - Linux desktop and Raspberry Pi support
 
 ## Prerequisites
