@@ -7,13 +7,20 @@
 - **Go** 1.21+
 - **FFmpeg** (installed and in PATH)
 - **C compiler** (gcc or clang, for CGO if needed)
+- **Fyne GUI dependencies** (GL, GLFW, Wayland/X11)
 
 ```bash
 # Ubuntu/Debian
-sudo apt install golang ffmpeg build-essential
+sudo apt install golang ffmpeg build-essential \
+  libgl1-mesa-dev libglu1-mesa-dev libwayland-dev libx11-dev \
+  libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev \
+  libxkbcommon-dev libxxf86vm-dev
 
 # Raspberry Pi OS
-sudo apt install golang ffmpeg build-essential
+sudo apt install golang ffmpeg build-essential \
+  libgl1-mesa-dev libglu1-mesa-dev libwayland-dev libx11-dev \
+  libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev \
+  libxkbcommon-dev libxxf86vm-dev
 ```
 
 ### Verify Installation
