@@ -28,6 +28,11 @@ const (
 	argon2KeyLength = 32
 )
 
+// TestArgon2Params are reduced parameters for testing.
+var TestArgon2Params = struct {
+	Iter, Mem, Threads, KeyLength uint32
+}{1, 64, 1, 32}
+
 // Storage handles encrypted config read/write.
 type Storage struct {
 	dir string
