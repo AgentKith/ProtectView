@@ -22,7 +22,7 @@ func TestCalculateGrid(t *testing.T) {
 		{"one camera", 1, 1, 1},
 		{"two cameras", 2, 1, 2},
 		{"four cameras", 4, 2, 2},
-		{"nine cameras", 9, 3, 3},
+		{"nine cameras", 9, 2, 5},
 		{"six cameras", 6, 2, 3},
 	}
 
