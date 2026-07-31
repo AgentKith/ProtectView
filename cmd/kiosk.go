@@ -10,7 +10,7 @@ import (
 const (
 	kioskUser = "unvr-kiosk"
 	kioskGroup = "unvr-kiosk"
-	systemdService = "[Unit]\nDescription=UNVR Carousal Kiosk\nAfter=graphical.target\n\n[Service]\nType=simple\nUser=%i\nExecStart=/usr/local/bin/unvr-carousal --kiosk\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=graphical.target"
+	systemdService = "[Unit]\nDescription=UNVR Carousal Kiosk\nAfter=graphical.target\n\n[Service]\nType=simple\nUser=" + kioskUser + "\nExecStart=/usr/local/bin/unvr-carousal --kiosk\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=graphical.target"
 )
 
 // SetupKiosk sets up the kiosk environment.
@@ -88,8 +88,7 @@ func configureAutologin() error {
 }
 
 func createSystemdService() error {
-	content := fmt.Sprintf(systemdService, kioskUser)
-	return os.WriteFile("/etc/systemd/system/unvr-kiosk.service", []byte(content), 0644)
+	return os.WriteFile("/etc/systemd/system/unvr-kiosk.service", []byte(systemdService), 0644)
 }
 
 func enableService() error {
