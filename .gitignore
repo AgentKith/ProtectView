@@ -1,7 +1,12 @@
+# Build
+build/
+cmake-build-*/
+*.o
+*.so
+*.a
+
 # Binaries
 unvr-carousal
-unvr-carousal-pi
-unvr-carousal-pi64
 
 # Config
 ~/.config/unvr-carousal/
@@ -17,10 +22,11 @@ unvr-carousal-pi64
 .DS_Store
 Thumbs.db
 
-# Go
-*.exe
-*.test
-*.out
+# Coverage
+*.gcda
+*.gcno
+*.info
+coverage/
 
 # Temp
 tmp/

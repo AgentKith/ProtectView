@@ -1,0 +1,74 @@
+#include "settingsdialog.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QFormLayout>
+#include <QLabel>
+
+SettingsDialog::SettingsDialog(QWidget *parent)
+    : QDialog(parent),
+      hostEdit_(new QLineEdit),
+      apiKeyEdit_(new QLineEdit),
+      ffmpegPathEdit_(new QLineEdit),
+      qualityCombo_(new QComboBox),
+      skipTlsCheck_(new QCheckBox),
+      retryIntervalEdit_(new QSpinBox),
+      saveButton_(new QPushButton("Save")),
+      cancelButton_(new QPushButton("Cancel")) {
+    setWindowTitle("Settings");
+    setMinimumWidth(400);
+
+    apiKeyEdit_->setEchoMode(QLineEdit::Password);
+    qualityCombo_->addItems({"Low", "Medium", "High"});
+    qualityCombo_->setCurrentIndex(1);
+    retryIntervalEdit_->setRange(1, 60);
+    retryIntervalEdit_->setValue(5);
+    retryIntervalEdit_->setSuffix("s");
+
+    QFormLayout *form = new QFormLayout;
+    form->addRow("UNVR Host:", hostEdit_);
+    form->addRow("API Key:", apiKeyEdit_);
+    form->addRow("FFmpeg Path:", ffmpegPathEdit_);
+    form->addRow("Video Quality:", qualityCombo_);
+    form->addRow("Skip TLS Verify:", skipTlsCheck_);
+    form->addRow("Retry Interval:", retryIntervalEdit_);
+
+    QHBoxLayout *buttons = new QHBoxLayout;
+    buttons->addStretch();
+    buttons->addWidget(saveButton_);
+    buttons->addWidget(cancelButton_);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(form);
+    mainLayout->addLayout(buttons);
+    setLayout(mainLayout);
+
+    connect(saveButton_, &QPushButton::clicked, this, [this]() {
+        emit settingsChanged();
+        accept();
+    });
+    connect(cancelButton_, &QPushButton::clicked, this, &QDialog::reject);
+}
+
+QString SettingsDialog::unvrHost() const {
+    return hostEdit_->text();
+}
+
+QString SettingsDialog::apiKey() const {
+    return apiKeyEdit_->text();
+}
+
+QString SettingsDialog::ffmpegPath() const {
+    return ffmpegPathEdit_->text();
+}
+
+int SettingsDialog::videoQuality() const {
+    return qualityCombo_->currentIndex();
+}
+
+bool SettingsDialog::skipTlsVerify() const {
+    return skipTlsCheck_->isChecked();
+}
+
+int SettingsDialog::retryInterval() const {
+    return retryIntervalEdit_->value();
+}

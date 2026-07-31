@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="kiosk-setup.sh">kiosk/setup-kiosk.sh</file>
+        <file alias="kiosk-undo.sh">kiosk/undo-kiosk.sh</file>
+    </qresource>
+</RCC>
