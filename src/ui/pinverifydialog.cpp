@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QCryptographicHash>
+#include <QGraphicsDropShadowEffect>
 
 PINVerifyDialog::PINVerifyDialog(const QString &pinHash, QWidget *parent)
     : QDialog(parent),
@@ -11,10 +12,20 @@ PINVerifyDialog::PINVerifyDialog(const QString &pinHash, QWidget *parent)
       verified_(false),
       errorLabel_(new QLabel("Enter PIN to access settings")) {
     setWindowTitle("Enter PIN");
-    setFixedSize(320, 400);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    setFixedSize(448, 800);
     setModal(true);
 
+    {
+        QGraphicsDropShadowEffect *glow = new QGraphicsDropShadowEffect(this);
+        glow->setColor(QColor(255, 107, 0));
+        glow->setBlurRadius(40);
+        glow->setOffset(0, 0);
+        setGraphicsEffect(glow);
+    }
+
     errorLabel_->setAlignment(Qt::AlignCenter);
+    errorLabel_->setMinimumHeight(80);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(errorLabel_);
@@ -32,7 +43,7 @@ void PINVerifyDialog::onPinSubmitted(const QString &pin) {
         accept();
     } else {
         errorLabel_->setText("Incorrect PIN, try again");
-        errorLabel_->setStyleSheet("color: #ef4444;");
+        errorLabel_->setStyleSheet("color: #EF4444; font-size: 28px;");
     }
 }
 

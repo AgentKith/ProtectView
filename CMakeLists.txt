@@ -7,7 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Multimedia Test OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Multimedia Test OpenGLWidgets Svg)
 find_package(OpenSSL REQUIRED)
 find_package(X11 REQUIRED)
 

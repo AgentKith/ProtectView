@@ -2,6 +2,7 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QRandomGenerator>
+#include <QGraphicsDropShadowEffect>
 
 // ConnectionPage
 
@@ -115,16 +116,16 @@ void ConnectionPage::updateDetectButton() {
 void ConnectionPage::setError(QLineEdit *edit, bool error) {
     edit->setProperty("error", error);
     edit->setStyleSheet(error ?
-        "QLineEdit { border: 1px solid #ef4444; padding: 3px; }" :
-        "QLineEdit { border: 1px solid #555555; padding: 3px; }");
+        "QLineEdit { border: 2px solid #EF4444; padding: 16px 24px; }" :
+        "QLineEdit { border: 2px solid #2A2A2A; padding: 16px 24px; }");
 }
 
 void ConnectionPage::showTestResult(bool success, const QString &message, QLineEdit *errorField) {
     tested_ = success;
     resultLabel_->setText(message);
     resultLabel_->setStyleSheet(success ?
-        "QLabel { color: #22c55e; font-weight: bold; }" :
-        "QLabel { color: #ef4444; }");
+        "QLabel { color: #22C55E; font-weight: 700; font-size: 28px; }" :
+        "QLabel { color: #EF4444; font-size: 28px; }");
     if (errorField) {
         setError(errorField, true);
     }
@@ -322,7 +323,7 @@ PinPage::PinPage(QWidget *parent)
 
     mismatchLabel_ = new QLabel("PINs do not match");
     mismatchLabel_->setObjectName("mismatchLabel");
-    mismatchLabel_->setStyleSheet("QLabel { color: #ef4444; }");
+    mismatchLabel_->setStyleSheet("QLabel { color: #EF4444; font-size: 28px; }");
     mismatchLabel_->setVisible(false);
     layout->addRow("", mismatchLabel_);
 
@@ -346,8 +347,8 @@ PinPage::PinPage(QWidget *parent)
 void PinPage::setError(QLineEdit *edit, bool error) {
     edit->setProperty("error", error);
     edit->setStyleSheet(error ?
-        "QLineEdit { border: 1px solid #ef4444; padding: 3px; }" :
-        "QLineEdit { border: 1px solid #555555; padding: 3px; }");
+        "QLineEdit { border: 2px solid #EF4444; padding: 16px 24px; }" :
+        "QLineEdit { border: 2px solid #2A2A2A; padding: 16px 24px; }");
 }
 
 void PinPage::checkMatch() {
@@ -397,8 +398,17 @@ QString PinPage::getPinHash() const {
 
 SetupWizard::SetupWizard(QWidget *parent)
     : QWizard(parent) {
+    setObjectName("SetupWizard");
     setWindowTitle("Setup UNVR Carousel");
     setWizardStyle(QWizard::ModernStyle);
+
+    {
+        QGraphicsDropShadowEffect *glow = new QGraphicsDropShadowEffect(this);
+        glow->setColor(QColor(255, 107, 0));
+        glow->setBlurRadius(40);
+        glow->setOffset(0, 0);
+        setGraphicsEffect(glow);
+    }
 
     ConnectionPage *connPage = new ConnectionPage;
     addPage(connPage);

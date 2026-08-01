@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QLabel>
+#include <QGraphicsDropShadowEffect>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent),
@@ -14,8 +15,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
       retryIntervalEdit_(new QSpinBox),
       saveButton_(new QPushButton("Save")),
       cancelButton_(new QPushButton("Cancel")) {
+    setObjectName("SettingsDialog");
     setWindowTitle("Settings");
-    setMinimumWidth(400);
+
+    {
+        QGraphicsDropShadowEffect *glow = new QGraphicsDropShadowEffect(this);
+        glow->setColor(QColor(255, 107, 0));
+        glow->setBlurRadius(40);
+        glow->setOffset(0, 0);
+        setGraphicsEffect(glow);
+    }
 
     apiKeyEdit_->setEchoMode(QLineEdit::Password);
     qualityCombo_->addItems({"Low", "Medium", "High"});
@@ -32,14 +41,24 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     form->addRow("Skip TLS Verify:", skipTlsCheck_);
     form->addRow("Retry Interval:", retryIntervalEdit_);
 
-    QHBoxLayout *buttons = new QHBoxLayout;
+    QWidget *buttonPanel = new QWidget;
+    buttonPanel->setObjectName("FrostedPanel");
+    {
+        QGraphicsDropShadowEffect *panelGlow = new QGraphicsDropShadowEffect(buttonPanel);
+        panelGlow->setColor(QColor(255, 107, 0));
+        panelGlow->setBlurRadius(30);
+        panelGlow->setOffset(0, 0);
+        buttonPanel->setGraphicsEffect(panelGlow);
+    }
+
+    QHBoxLayout *buttons = new QHBoxLayout(buttonPanel);
     buttons->addStretch();
     buttons->addWidget(saveButton_);
     buttons->addWidget(cancelButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(form);
-    mainLayout->addLayout(buttons);
+    mainLayout->addWidget(buttonPanel);
     setLayout(mainLayout);
 
     connect(saveButton_, &QPushButton::clicked, this, [this]() {

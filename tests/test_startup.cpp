@@ -10,6 +10,10 @@
 class TestStartup : public QObject {
     Q_OBJECT
 private slots:
+    void initTestCase() {
+        Q_INIT_RESOURCE(styles);
+    }
+
     void testConstructorDoesNotCrash() {
         AppController controller;
         QCOMPARE(controller.getState(), AppController::State::NoConfig);
@@ -69,6 +73,15 @@ private slots:
         QCOMPARE(c1.getState(), AppController::State::NoConfig);
         QCOMPARE(c2.getState(), AppController::State::NoConfig);
         QCOMPARE(c3.getState(), AppController::State::NoConfig);
+    }
+
+    void testStylesheetResourceExists() {
+        QFile styleFile(":/app.qss");
+        QVERIFY2(styleFile.exists(), "Stylesheet resource :/app.qss not found - check styles.qrc is embedded and resource path matches");
+        QVERIFY(styleFile.open(QFile::ReadOnly | QFile::Text));
+        QByteArray content = styleFile.readAll();
+        styleFile.close();
+        QVERIFY(!content.isEmpty());
     }
 
     void testDefaultConfigValues() {

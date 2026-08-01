@@ -1,9 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file alias="settings.svg">../../assets/icons/settings.svg</file>
-        <file alias="fullscreen.svg">../../assets/icons/fullscreen.svg</file>
         <file alias="exit.svg">../../assets/icons/exit.svg</file>
+        <file alias="fullscreen.svg">../../assets/icons/fullscreen.svg</file>
         <file alias="retry.svg">../../assets/icons/retry.svg</file>
         <file alias="camera.svg">../../assets/icons/camera.svg</file>
+        <file alias="clear.svg">../../assets/icons/clear.svg</file>
+        <file alias="enter.svg">../../assets/icons/enter.svg</file>
     </qresource>
 </RCC>

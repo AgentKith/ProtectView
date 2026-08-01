@@ -1,26 +1,53 @@
 #include "edgemenu.h"
+#include <QGraphicsDropShadowEffect>
 
 EdgeMenu::EdgeMenu(QWidget *parent)
     : QWidget(parent),
       settingsButton_(new QPushButton("Settings")),
-      fullscreenButton_(new QPushButton("Fullscreen")),
       exitButton_(new QPushButton("Exit")) {
+    setObjectName("EdgeMenu");
     setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
-    setStyleSheet("background-color: rgba(26, 26, 26, 200);");
 
-    settingsButton_->setStyleSheet("padding: 10px; color: #e0e0e0;");
-    fullscreenButton_->setStyleSheet("padding: 10px; color: #e0e0e0;");
-    exitButton_->setStyleSheet("padding: 10px; color: #e0e0e0;");
+    settingsButton_->setObjectName("edgeButton");
+    exitButton_->setObjectName("edgeButton");
+
+    QWidget *buttonPanel = new QWidget;
+    buttonPanel->setObjectName("edgeButtonPanel");
+    {
+        QGraphicsDropShadowEffect *panelGlow = new QGraphicsDropShadowEffect(buttonPanel);
+        panelGlow->setColor(QColor(255, 107, 0));
+        panelGlow->setBlurRadius(30);
+        panelGlow->setOffset(0, 0);
+        buttonPanel->setGraphicsEffect(panelGlow);
+    }
+
+    {
+        QGraphicsDropShadowEffect *glow = new QGraphicsDropShadowEffect(settingsButton_);
+        glow->setColor(QColor(0, 212, 255));
+        glow->setBlurRadius(20);
+        glow->setOffset(0, 0);
+        settingsButton_->setGraphicsEffect(glow);
+    }
+    {
+        QGraphicsDropShadowEffect *glow = new QGraphicsDropShadowEffect(exitButton_);
+        glow->setColor(QColor(0, 212, 255));
+        glow->setBlurRadius(20);
+        glow->setOffset(0, 0);
+        exitButton_->setGraphicsEffect(glow);
+    }
+
+    QVBoxLayout *buttonLayout = new QVBoxLayout(buttonPanel);
+    buttonLayout->setSpacing(48);
+    buttonLayout->addWidget(settingsButton_);
+    buttonLayout->addWidget(exitButton_);
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(settingsButton_);
-    layout->addWidget(fullscreenButton_);
-    layout->addWidget(exitButton_);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(buttonPanel);
     setLayout(layout);
 
     connect(settingsButton_, &QPushButton::clicked, this, &EdgeMenu::settingsClicked);
-    connect(fullscreenButton_, &QPushButton::clicked, this, &EdgeMenu::fullscreenClicked);
     connect(exitButton_, &QPushButton::clicked, this, &EdgeMenu::exitClicked);
 
     hideTimer_.setInterval(3000);
@@ -30,7 +57,6 @@ EdgeMenu::EdgeMenu(QWidget *parent)
 
 void EdgeMenu::setKioskMode(bool kiosk) {
     exitButton_->setVisible(!kiosk);
-    fullscreenButton_->setVisible(!kiosk);
 }
 
 void EdgeMenu::showMenu() {

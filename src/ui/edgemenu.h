@@ -16,12 +16,10 @@ public:
 
 signals:
     void settingsClicked();
-    void fullscreenClicked();
     void exitClicked();
 
 private:
     QPushButton *settingsButton_;
-    QPushButton *fullscreenButton_;
     QPushButton *exitButton_;
     QTimer hideTimer_;
 };

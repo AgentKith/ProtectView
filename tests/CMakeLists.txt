@@ -41,12 +41,13 @@ add_library(test_utils STATIC
     ../src/resources/fonts.qrc
     ../src/resources/icons.qrc
     ../src/resources/kiosk.qrc
+    ../src/resources/styles.qrc
 )
 
 target_include_directories(test_utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 target_link_libraries(test_utils PUBLIC
-    Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::OpenGLWidgets
+    Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::OpenGLWidgets Qt6::Svg
     OpenSSL::SSL OpenSSL::Crypto
     X11::X11
 )

@@ -28,6 +28,7 @@ qt_add_executable(protectview
     resources/fonts.qrc
     resources/icons.qrc
     resources/kiosk.qrc
+    resources/styles.qrc
 )
 
 target_include_directories(protectview PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -35,5 +36,6 @@ target_include_directories(protectview PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(protectview PRIVATE
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::OpenGLWidgets
     OpenSSL::SSL OpenSSL::Crypto
+    Qt6::Svg
     X11::X11
 )

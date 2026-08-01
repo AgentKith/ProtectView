@@ -1,163 +1,172 @@
 # Design
 
-## Theme
+## Theme — Neon Touch
+
+**Neon border** aesthetic on dark background. Optimized for 4K touch display (2x linear / 4x area scaling).
 
 ### Colors
 
-| Element | Dark | Light |
-|---------|------|-------|
-| Background | `#0a0a0a` | `#f5f5f5` |
-| Card surface | `#1a1a1a` | `#ffffff` |
-| Foreground text | `#e0e0e0` | `#1a1a1a` |
-| Secondary text | `#888888` | `#666666` |
-| Accent | `#3b82f6` | `#2563eb` |
-| Error | `#ef4444` | `#dc2626` |
-| Success | `#22c55e` | `#16a34a` |
-| Border | `#2a2a2a` | `#e0e0e0` |
-| Hover overlay | `rgba(255,255,255,0.05)` | `rgba(0,0,0,0.03)` |
+| Role | Color | Hex | Usage |
+|------|-------|-----|-------|
+| **Primary** | Glowing orange | `#FF6B00` | Button borders, active states, accents, focus rings |
+| **Primary hover** | Bright orange | `#FF8C33` | Hover state |
+| **Primary press** | Light orange | `#FFB366` | Pressed state |
+| **Secondary** | Electric cyan | `#00D4FF` | Links, secondary actions, edge menu buttons |
+| **Secondary hover** | Bright cyan | `#33DDFF` | Hover state |
+| **Information** | Cool white | `#E0E0E0` | Body text, labels |
+| **Secondary text** | Muted gray | `#888888` | Subtitles, captions |
+| **Disabled** | Dim ember | `#6B3A00` | Disabled buttons, inactive states |
+| **Background** | Deep black | `#0A0A0A` | App background |
+| **Surface** | Dark card | `#1A1A1A` | Dialogs, panels, tiles |
+| **Border** | Subtle gray | `#2A2A2A` | Input borders, dividers |
+| **Error** | Red | `#EF4444` | Error states, validation |
+| **Success** | Green | `#22C55E` | Success states |
 
-### Sizes
+### Sizes (Touch-Optimized, 4K)
+
+All sizes are **2x** the original (4x area) for comfortable touch interaction.
 
 | Element | Value |
 |---------|-------|
-| Corner radius (cards) | 12px |
-| Corner radius (buttons) | 8px |
-| Corner radius (inputs) | 8px |
-| Padding (large) | 24px |
-| Padding (medium) | 16px |
-| Padding (small) | 8px |
-| Font size (heading) | 24px |
-| Font size (body) | 14px |
-| Font size (caption) | 12px |
-| Icon size (standard) | 20px |
-| Icon size (large) | 24px |
+| Corner radius (cards/dialogs) | 24px |
+| Corner radius (buttons) | 16px |
+| Corner radius (inputs) | 16px |
+| Corner radius (PIN buttons) | 24px |
+| Padding (large) | 48px |
+| Padding (medium) | 32px |
+| Padding (small) | 16px |
+| Font size (heading) | 48px |
+| Font size (body) | 28px |
+| Font size (button) | 40px |
+| Font size (PIN digits) | 48px |
+| Font size (caption) | 24px |
+| Icon size (standard) | 40px |
+| Icon size (large) | 48px |
+| Button min size | 160×80px |
+| PIN button size | 160×160px |
+| Input min height | 60px |
+| Grid spacing | 8px |
+| Grid margins | 8px |
+| Checkbox indicator | 48×48px |
+| Scrollbar width/height | 32px |
 | Menu edge trigger zone | 40px from screen edge |
 
-### Shadows
+### Dialog Sizes
 
-| Element | Shadow |
-|---------|--------|
-| Popup menu | `0 4px 24px rgba(0,0,0,0.4)` |
-| Settings panel | `0 8px 32px rgba(0,0,0,0.5)` |
-| PIN pad | `0 4px 16px rgba(0,0,0,0.3)` |
-| Camera tile (error) | None |
+| Dialog | Size |
+|--------|------|
+| Settings | min-width: 800px |
+| PIN Verify | 640×800px |
+| Setup Wizard | min-width: 800px |
 
 ## Font
 
-**Inter** — OFL-1.1 license, embedded via `go:embed`.
+**Plus Jakarta Sans** — SIL Open Font License (OFL), variable font embedded via Qt resources.
 
-| Weight | File | Usage |
-|--------|------|-------|
-| Regular 400 | `Inter-Regular.ttf` | Body text, labels |
-| Medium 500 | `Inter-Medium.ttf` | Button text, settings labels |
-| Semi Bold 600 | `Inter-SemiBold.ttf` | Section headers, camera names |
-| Bold 700 | `Inter-Bold.ttf` | Headings, PIN pad numbers |
+| Weight | Usage |
+|--------|-------|
+| Regular 400 | Body text, labels, inputs |
+| Medium 500 | Button text, settings labels, camera names |
+| SemiBold 600 | Section headers, camera names (error state) |
+| Bold 700 | Headings, PIN pad numbers, PIN display |
 
-Total embedded size: ~400KB.
+Variable font (single file, all weights): ~173KB + 179KB (italic).
 
-### Fyne Theme Integration
+### Qt Registration
 
-```go
-func (t *theme) Font(style fyne.TextStyle) fyne.Resource {
-    switch {
-    case style.Bold:
-        return interBold
-    case style.Italic:
-        return interRegular // fallback, no italic weights
-    case style.Monospace:
-        return interRegular // fallback
-    default:
-        return interRegular
-    }
-}
+```cpp
+QFontDatabase::addApplicationFont(":/PlusJakartaSans-Variable.ttf");
+QFontDatabase::addApplicationFont(":/PlusJakartaSans-Italic-Variable.ttf");
+
+QFont font("Plus Jakarta Sans", 28);
+qApp->setFont(font);
 ```
+
+## Style Sheets
+
+**QSS file**: `src/ui/styles/app.qss` — loaded at startup via `qApp->setStyleSheet()`.
+
+Covers: QWidget, QMainWindow, QDialog, QWizard, QPushButton, QLineEdit, QLabel, QComboBox, QSpinBox, QCheckBox, QFormLayout, QScrollBar.
+
+Special objectNames for targeted styling:
+- `#EdgeMenu` — edge overlay menu
+- `#edgeButton` — edge menu buttons (cyan theme)
+- `#pinDigit` — PIN pad digit buttons (orange, 160×160)
+- `#pinAction` — PIN pad action buttons (cyan, 160×160)
+- `#pinDisplay` — PIN dot display (48px bold)
+
+Dynamic styles (inline, for runtime state changes):
+- Error borders on QLineEdit (red border on validation error)
+- Success/error label colors in wizard
+- PIN mismatch label
 
 ## Icons
 
-**Lucide** — ISC license, embedded as SVGs via `go:embed`.
+**Lucide** — ISC license, embedded as SVGs via Qt resources.
 
 | Icon | Usage |
 |------|-------|
 | `settings` | Settings button |
-| `lock` | PIN pad, security |
-| `monitor` | Camera feed, fullscreen |
-| `x` | Close, dismiss |
-| `check` | Success, confirm |
-| `eye` | Show PIN |
-| `eye-off` | Hide PIN |
-| `layout-grid` | Grid layout |
-| `sliders-horizontal` | Video settings |
-| `wifi` | Connection status |
-| `shield` | TLS/security |
-| `refresh-cw` | Retry, reconnect |
-| `triangle-alert` | Error, warning |
-
-### SVG Color Injection
-
-Lucide SVGs use `currentColor` for stroke/fill. Inject theme-aware color:
-
-```go
-func renderIcon(name string, color color.Color) *canvas.Image {
-    svg := embeddedIcons[name]
-    colored := strings.ReplaceAll(svg, "currentColor", colorToHex(color))
-    img, _ := svgimg.Unmarshal([]byte(colored))
-    pic := picture.NewImage(img)
-    return canvas.NewImageFromResource(pic)
-}
-```
+| `fullscreen` | Fullscreen toggle |
+| `exit` | Exit button |
+| `retry` | Retry, reconnect |
+| `camera` | Camera icon |
 
 ## UI Screens
 
 ### Main Feed
 
 - Fullscreen grid of camera tiles
-- Each tile: `canvas.Image` with camera name overlay (top-left, semi-transparent background)
-- Tile spacing: 4px gaps
-- Error state: dark tile (`#1a1a1a`), camera name centered, pulsing `refresh-cw` icon below
+- Each tile: custom `paintEvent` with camera frame or error overlay
+- Tile spacing: 8px gaps
+- Error state: dark tile (`#1A1A1A`), camera name + error message centered, error color (`#EF4444`), font size 28px SemiBold
+- Normal state: camera name centered, info color (`#E0E0E0`), font size 28px Medium
 - Edge hover zone: 40px from screen edges, triggers menu
 
 ### Edge-Hover Menu
 
-- Slide-in from screen edge (200ms ease-out)
-- Width: 60px, height: full screen
-- Items (vertical): settings, fullscreen toggle, layout, exit
-- Icons only, no text labels
-- Hover highlight: `rgba(255,255,255,0.1)` background
-- Dismiss: hover away from edge
+- Overlay panel, top-right corner
+- Background: `rgba(10, 10, 10, 230)`, neon orange border, 24px border radius
+- Buttons: cyan borders (`#00D4FF`), 36px font, 24px padding
+- Auto-hide after 3s
+- Items (vertical): settings, fullscreen toggle, exit
 
 ### Settings Panel
 
-- Modal popup, centered, 600x500px
-- Sections (scrollable):
+- Modal dialog, centered, min-width: 800px
+- Neon orange border, 24px border radius, 32px padding
+- Sections (form layout):
   - **Connection**: UNVR host, API key, TLS option
   - **Video**: Backend mode, quality per camera
   - **Layout**: Auto/custom grid, camera selection
   - **Appearance**: Theme, fullscreen
   - **Security**: Change PIN
-- Close: `x` button (top-right), ESC key
+- Inputs: 28px font, 60px min height, 16px padding
+- Buttons: 40px font, orange borders, 24px padding
+- Close: ESC key, Cancel button
 
 ### Setup Wizard
 
-- First-run only, modal, 500x400px
+- First-run only, modal, min-width: 800px
+- Neon orange border, 24px border radius, 48px padding
 - Steps (progress indicator at top):
-  1. **UNVR Host**: Entry field, "Next" button
-  2. **API Key**: Entry field, "Next" button
-  3. **Set PIN**: Two entry fields (PIN + confirm), "Next" button
-  4. **Test Connection**: Loading spinner, success/error result, "Done" button
-- Back button on each step
+  1. **Connection**: Host, API key, TLS, test connection
+  2. **Set PIN**: PIN + confirm, mismatch validation
+- Input validation: red border (`#EF4444`) on error, subtle gray (`#2A2A2A`) on valid
+- Test result: green (`#22C55E`) for success, red (`#EF4444`) for error
+- Back/Next buttons styled with global QPushButton rules
 
 ### PIN Pad
 
-- Modal popup, centered, 320x400px
-- 16 buttons in 4x4 grid (0-9 + 6 decoy numbers)
-- Button size: 64x64px, corner radius 12px
-- Button color: `#2a2a2a`, text: `#e0e0e0`
-- Hover: `#3a3a3a`
-- Press: `#4a4a4a`
-- Random positions: decoy buttons mixed with real digits
-- Display: 6 dots (filled/empty) above grid
-- Shake animation on wrong PIN (200ms, 3 oscillations)
-- Close: `x` button, ESC key
+- Modal dialog, 640×800px
+- 10 digit buttons (0-9) in 3×3 + bottom row grid
+- Digit button size: 160×160px, corner radius 24px
+- Digit button: `#1A1A1A` background, orange border (`#FF6B00`), 48px Bold font
+- Action buttons (Clear, Enter): cyan border (`#00D4FF`), 40px SemiBold font
+- Display: 48px Bold, 100px min height, centered dots
+- Random positions: shuffled on each creation
+- Shake animation on wrong PIN (200ms, 3 oscillations) — TBD
+- Close: ESC key
 
 ### Kiosk Mode
 
@@ -199,29 +208,7 @@ func renderIcon(name string, color color.Color) *canvas.Image {
 
 ### Auto Grid
 
-Calculate optimal rows×cols from camera count and screen aspect ratio:
-
-```go
-func calculateGrid(cameras int, screenAspect float64) (rows, cols int) {
-    // Target: tiles should be roughly square (16:9 aspect)
-    // Screen aspect: width/height
-    // Grid aspect: cols/rows should match screen aspect / 16:9
-
-    targetAspect := screenAspect / (16.0 / 9.0)
-
-    for cols := 1; cols <= cameras; cols++ {
-        rows = (cameras + cols - 1) / cols // ceiling division
-        gridAspect := float64(cols) / float64(rows)
-        if math.Abs(gridAspect-targetAspect) < 0.3 {
-            return rows, cols
-        }
-    }
-    // Fallback: sqrt
-    cols = int(math.Sqrt(float64(cameras)))
-    rows = (cameras + cols - 1) / cols
-    return rows, cols
-}
-```
+Calculate optimal rows×cols from camera count and screen aspect ratio.
 
 ### Common Layouts
 

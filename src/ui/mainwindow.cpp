@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
     central->setLayout(gridLayout_);
     setCentralWidget(central);
 
+    setWindowFlags(Qt::FramelessWindowHint);
+    showFullScreen();
+
     edgeMenu_ = new EdgeMenu(this);
     edgeMenu_->hide();
     connect(edgeMenu_, &EdgeMenu::settingsClicked, this, &MainWindow::settingsRequested);
@@ -55,8 +58,8 @@ void MainWindow::addCamera(const QString &cameraName) {
 }
 
 void MainWindow::arrangeGrid() {
-    gridLayout_->setSpacing(4);
-    gridLayout_->setContentsMargins(4, 4, 4, 4);
+    gridLayout_->setSpacing(8);
+    gridLayout_->setContentsMargins(8, 8, 8, 8);
 
     int cols = 2;
     int rows = (tiles_.size() + cols - 1) / cols;

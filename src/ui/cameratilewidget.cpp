@@ -52,13 +52,13 @@ void CameraTileWidget::paintEvent(QPaintEvent *event) {
         painter.fillRect(rect(), QColor(26, 26, 26));
 
         painter.setPen(QColor(239, 68, 68));
-        painter.setFont(QFont("Inter", 14));
+        painter.setFont(QFont("Plus Jakarta Sans", 28, QFont::DemiBold));
         painter.drawText(rect(), Qt::AlignCenter, cameraName_ + "\n" + errorMessage_);
     } else {
         painter.fillRect(rect(), QColor(26, 26, 26));
 
         painter.setPen(QColor(224, 224, 224));
-        painter.setFont(QFont("Inter", 14));
+        painter.setFont(QFont("Plus Jakarta Sans", 28, QFont::Medium));
         painter.drawText(rect(), Qt::AlignCenter, cameraName_);
     }
 }
