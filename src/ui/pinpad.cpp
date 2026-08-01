@@ -42,6 +42,11 @@ void PINPad::setupUI() {
     connect(clearButton_, &QPushButton::clicked, this, &PINPad::onClearPressed);
     connect(enterButton_, &QPushButton::clicked, this, &PINPad::onEnterPressed);
 
+    installEventFilter(this);
+    for (QPushButton *btn : digitButtons_) btn->installEventFilter(this);
+    clearButton_->installEventFilter(this);
+    enterButton_->installEventFilter(this);
+
     QGridLayout *grid = new QGridLayout;
     for (int i = 0; i < 9; ++i) {
         int row = i / 3;
@@ -94,16 +99,25 @@ void PINPad::onClearPressed() {
 }
 
 void PINPad::onEnterPressed() {
-    if (enteredPin_ == expectedPin_) {
-        emit pinAccepted();
-    } else {
-        emit pinRejected();
-    }
+    emit pinSubmitted(enteredPin_);
     enteredPin_.clear();
     display_->setText("");
 }
 
+bool PINPad::eventFilter(QObject *obj, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        handleKeyEvent(keyEvent);
+        return true;
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
 void PINPad::keyPressEvent(QKeyEvent *event) {
+    handleKeyEvent(event);
+}
+
+void PINPad::handleKeyEvent(QKeyEvent *event) {
     if (event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) {
         int digit = event->key() - Qt::Key_0;
         appendDigit(digit);
@@ -115,6 +129,8 @@ void PINPad::keyPressEvent(QKeyEvent *event) {
             display_->setText(QString("●").repeated(enteredPin_.length()));
         }
     } else if (event->key() == Qt::Key_Escape) {
+        emit pinDismissed();
+    } else if (event->key() == Qt::Key_C) {
         onClearPressed();
     } else {
         QWidget::keyPressEvent(event);

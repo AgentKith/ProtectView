@@ -5,6 +5,14 @@ if(ENABLE_COVERAGE)
     add_link_options(--coverage)
 endif()
 
+# Helper: add test with offscreen Qt platform (no display server needed)
+function(add_pv_test NAME)
+    add_test(NAME ${NAME} COMMAND ${NAME})
+    set_tests_properties(${NAME} PROPERTIES
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+    )
+endfunction()
+
 add_library(test_utils STATIC
     ../src/app/config.h ../src/app/config.cpp
     ../src/app/storage.h ../src/app/storage.cpp
@@ -45,60 +53,64 @@ target_link_libraries(test_utils PUBLIC
 
 qt_add_executable(test_config test_config.cpp)
 target_link_libraries(test_config PRIVATE test_utils Qt6::Test)
-add_test(NAME test_config COMMAND test_config)
+add_pv_test(test_config)
 
 qt_add_executable(test_storage test_storage.cpp)
 target_link_libraries(test_storage PRIVATE test_utils Qt6::Test)
-add_test(NAME test_storage COMMAND test_storage)
+add_pv_test(test_storage)
 
 qt_add_executable(test_fingerprint test_fingerprint.cpp)
 target_link_libraries(test_fingerprint PRIVATE test_utils Qt6::Test)
-add_test(NAME test_fingerprint COMMAND test_fingerprint)
+add_pv_test(test_fingerprint)
 
 qt_add_executable(test_wizard test_wizard.cpp)
 target_link_libraries(test_wizard PRIVATE test_utils Qt6::Test)
-add_test(NAME test_wizard COMMAND test_wizard)
+add_pv_test(test_wizard)
 
 qt_add_executable(test_appcontroller test_appcontroller.cpp)
 target_link_libraries(test_appcontroller PRIVATE test_utils Qt6::Test)
-add_test(NAME test_appcontroller COMMAND test_appcontroller)
+add_pv_test(test_appcontroller)
 
 qt_add_executable(test_client test_client.cpp)
 target_link_libraries(test_client PRIVATE test_utils Qt6::Test)
-add_test(NAME test_client COMMAND test_client)
+add_pv_test(test_client)
 
 qt_add_executable(test_ffmpegplayer test_ffmpegplayer.cpp)
 target_link_libraries(test_ffmpegplayer PRIVATE test_utils Qt6::Test)
-add_test(NAME test_ffmpegplayer COMMAND test_ffmpegplayer)
+add_pv_test(test_ffmpegplayer)
 
 qt_add_executable(test_snapshotplayer test_snapshotplayer.cpp)
 target_link_libraries(test_snapshotplayer PRIVATE test_utils Qt6::Test)
-add_test(NAME test_snapshotplayer COMMAND test_snapshotplayer)
+add_pv_test(test_snapshotplayer)
 
 qt_add_executable(test_mainwindow test_mainwindow.cpp)
 target_link_libraries(test_mainwindow PRIVATE test_utils Qt6::Test)
-add_test(NAME test_mainwindow COMMAND test_mainwindow)
+add_pv_test(test_mainwindow)
 
 qt_add_executable(test_cameratile test_cameratile.cpp)
 target_link_libraries(test_cameratile PRIVATE test_utils Qt6::Test)
-add_test(NAME test_cameratile COMMAND test_cameratile)
+add_pv_test(test_cameratile)
 
 qt_add_executable(test_settings test_settings.cpp)
 target_link_libraries(test_settings PRIVATE test_utils Qt6::Test)
-add_test(NAME test_settings COMMAND test_settings)
+add_pv_test(test_settings)
 
 qt_add_executable(test_pinpad test_pinpad.cpp)
 target_link_libraries(test_pinpad PRIVATE test_utils Qt6::Test)
-add_test(NAME test_pinpad COMMAND test_pinpad)
+add_pv_test(test_pinpad)
+
+qt_add_executable(test_pin_verify test_pin_verify.cpp)
+target_link_libraries(test_pin_verify PRIVATE test_utils Qt6::Test)
+add_pv_test(test_pin_verify)
 
 qt_add_executable(test_edgemenu test_edgemenu.cpp)
 target_link_libraries(test_edgemenu PRIVATE test_utils Qt6::Test)
-add_test(NAME test_edgemenu COMMAND test_edgemenu)
+add_pv_test(test_edgemenu)
 
 qt_add_executable(test_cameramanager test_cameramanager.cpp)
 target_link_libraries(test_cameramanager PRIVATE test_utils Qt6::Test)
-add_test(NAME test_cameramanager COMMAND test_cameramanager)
+add_pv_test(test_cameramanager)
 
 qt_add_executable(test_startup test_startup.cpp)
 target_link_libraries(test_startup PRIVATE test_utils Qt6::Test)
-add_test(NAME test_startup COMMAND test_startup)
+add_pv_test(test_startup)

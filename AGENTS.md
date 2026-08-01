@@ -72,6 +72,15 @@
 - Android connects to Pi's stream instead of UNVR directly
 - Offloads decoding to Pi, low Android CPU
 
+## Testing
+
+Tests use Qt6 Test with offscreen platform (no display server needed). `tests/CMakeLists.txt` sets `QT_QPA_PLATFORM=offscreen` automatically via test properties.
+
+```bash
+# From build directory
+ctest --output-on-failure
+```
+
 ## Doc Index
 
 | Doc | Purpose |

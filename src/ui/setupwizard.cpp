@@ -1,6 +1,7 @@
 #include "setupwizard.h"
 #include <QMessageBox>
-#include <cstdlib>
+#include <QFile>
+#include <QRandomGenerator>
 
 // ConnectionPage
 
@@ -370,8 +371,16 @@ bool PinPage::isComplete() const {
 
     QByteArray salt;
     salt.reserve(16);
-    for (int i = 0; i < 16; ++i) {
-        salt.append(static_cast<char>(rand() % 256));
+
+    QFile urandom("/dev/urandom");
+    if (urandom.open(QIODevice::ReadOnly)) {
+        salt = urandom.read(16);
+        urandom.close();
+    } else {
+        QRandomGenerator *rng = QRandomGenerator::system();
+        for (int i = 0; i < 16; ++i) {
+            salt.append(static_cast<char>(rng->generate() & 0xFF));
+        }
     }
 
     QByteArray preImage = salt + pin.toUtf8();

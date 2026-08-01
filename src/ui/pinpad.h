@@ -15,19 +15,21 @@ public:
     QString enteredPin() const;
 
 signals:
-    void pinAccepted();
-    void pinRejected();
+    void pinSubmitted(const QString &pin);
+    void pinDismissed();
 
 private slots:
     void onDigitPressed();
     void onClearPressed();
     void onEnterPressed();
 
-private:
+ private:
     void keyPressEvent(QKeyEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
     void setupUI();
     void shuffleButtons();
     void appendDigit(int digit);
+    void handleKeyEvent(QKeyEvent *event);
 
     QString expectedPin_;
     QString enteredPin_;

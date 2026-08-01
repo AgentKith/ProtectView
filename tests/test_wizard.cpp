@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QMessageBox>
+#include <QCryptographicHash>
+#include <QRegularExpression>
 #include "../src/ui/setupwizard.h"
 
 class TestWizard : public QObject {
@@ -18,6 +20,8 @@ private slots:
     void testPinValidation();
     void testPinMismatch();
     void testFinishReturnsConfig();
+    void testPinHashFormat();
+    void testPinHashIsVerifiable();
 };
 
 void TestWizard::testWizardCreation() {
@@ -133,6 +137,65 @@ void TestWizard::testFinishReturnsConfig() {
     QCOMPARE(wizard.getHost(), "192.168.1.100");
     QCOMPARE(wizard.getApiKey(), "test-api-key");
     QVERIFY(!wizard.getPinHash().isEmpty());
+}
+
+void TestWizard::testPinHashFormat() {
+    SetupWizard wizard;
+
+    wizard.setCurrentId(0);
+    QLineEdit *hostEdit = wizard.findChild<QLineEdit *>("hostEdit");
+    hostEdit->setText("192.168.1.100");
+    QLineEdit *apiKeyEdit = wizard.findChild<QLineEdit *>("apiKeyEdit");
+    apiKeyEdit->setText("test-api-key");
+
+    wizard.setCurrentId(1);
+    QLineEdit *pinEdit = wizard.findChild<QLineEdit *>("pinEdit");
+    pinEdit->setText("123456");
+    QLineEdit *confirmEdit = wizard.findChild<QLineEdit *>("confirmPinEdit");
+    confirmEdit->setText("123456");
+
+    wizard.accept();
+
+    QString hash = wizard.getPinHash();
+    QCOMPARE(hash.length(), 96);
+
+    QByteArray salt = QByteArray::fromHex(hash.left(32).toUtf8());
+    QCOMPARE(salt.size(), 16);
+
+    QString hashPart = hash.mid(32);
+    QCOMPARE(hashPart.length(), 64);
+
+    QRegularExpression hexRe("^[0-9a-f]+$");
+    QVERIFY(hexRe.match(hash).hasMatch());
+}
+
+void TestWizard::testPinHashIsVerifiable() {
+    SetupWizard wizard;
+
+    wizard.setCurrentId(0);
+    QLineEdit *hostEdit = wizard.findChild<QLineEdit *>("hostEdit");
+    hostEdit->setText("192.168.1.100");
+    QLineEdit *apiKeyEdit = wizard.findChild<QLineEdit *>("apiKeyEdit");
+    apiKeyEdit->setText("test-api-key");
+
+    QString testPin = "987654";
+    wizard.setCurrentId(1);
+    QLineEdit *pinEdit = wizard.findChild<QLineEdit *>("pinEdit");
+    pinEdit->setText(testPin);
+    QLineEdit *confirmEdit = wizard.findChild<QLineEdit *>("confirmPinEdit");
+    confirmEdit->setText(testPin);
+
+    wizard.accept();
+
+    QString hash = wizard.getPinHash();
+
+    QByteArray salt = QByteArray::fromHex(hash.left(32).toUtf8());
+    QString storedHash = hash.mid(32);
+
+    QByteArray preImage = salt + testPin.toUtf8();
+    QByteArray computedHash = QCryptographicHash::hash(preImage, QCryptographicHash::Sha256);
+
+    QCOMPARE(computedHash.toHex(), storedHash.toUtf8());
 }
 
 QTEST_MAIN(TestWizard)

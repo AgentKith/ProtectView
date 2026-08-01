@@ -191,6 +191,25 @@ sudo systemctl enable ProtectView
 sudo systemctl enable lightdm
 ```
 
+## Testing
+
+```bash
+cd build
+ctest --output-on-failure
+```
+
+Tests use Qt6 Test with offscreen platform (`QT_QPA_PLATFORM=offscreen`), set automatically via test properties in `tests/CMakeLists.txt`. No display server needed.
+
+### Code Coverage
+
+Build with coverage enabled, then run tests:
+
+```bash
+cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON
+cmake --build build
+cd build && ctest --output-on-failure
+```
+
 ## Troubleshooting
 
 ### FFmpeg Not Found

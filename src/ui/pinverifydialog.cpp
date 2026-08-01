@@ -8,34 +8,32 @@ PINVerifyDialog::PINVerifyDialog(const QString &pinHash, QWidget *parent)
     : QDialog(parent),
       pinPad_(new PINPad(this)),
       pinHash_(pinHash),
-      verified_(false) {
+      verified_(false),
+      errorLabel_(new QLabel("Enter PIN to access settings")) {
     setWindowTitle("Enter PIN");
     setFixedSize(320, 400);
     setModal(true);
 
-    QLabel *label = new QLabel("Enter PIN to access settings");
-    label->setAlignment(Qt::AlignCenter);
+    errorLabel_->setAlignment(Qt::AlignCenter);
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(label);
+    layout->addWidget(errorLabel_);
     layout->addWidget(pinPad_);
     setLayout(layout);
 
-    connect(pinPad_, &PINPad::pinAccepted, this, [this, label]() {
-        if (verifyPin(pinPad_->enteredPin())) {
-            verified_ = true;
-            emit verified();
-            accept();
-        } else {
-            label->setText("Incorrect PIN, try again");
-            label->setStyleSheet("color: #ef4444;");
-        }
-    });
+    connect(pinPad_, &PINPad::pinSubmitted, this, &PINVerifyDialog::onPinSubmitted);
+    connect(pinPad_, &PINPad::pinDismissed, this, &QDialog::reject);
+}
 
-    connect(pinPad_, &PINPad::pinRejected, this, [this, label]() {
-        label->setText("Incorrect PIN, try again");
-        label->setStyleSheet("color: #ef4444;");
-    });
+void PINVerifyDialog::onPinSubmitted(const QString &pin) {
+    if (verifyPin(pin)) {
+        verified_ = true;
+        emit verified();
+        accept();
+    } else {
+        errorLabel_->setText("Incorrect PIN, try again");
+        errorLabel_->setStyleSheet("color: #ef4444;");
+    }
 }
 
 bool PINVerifyDialog::wasVerified() const {
