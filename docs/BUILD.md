@@ -36,45 +36,45 @@ gcc --version  # any version
 ```bash
 # Clone
 git clone <repo-url>
-cd unvr-carousal
+cd ProtectView
 
 # Download dependencies
 go mod tidy
 
 # Build
-go build -o unvr-carousal .
+go build -o ProtectView .
 
 # Run
-./unvr-carousal
+./ProtectView
 ```
 
 ## Build Flags
 
 ```bash
 # Release build (strip debug info, smaller binary)
-go build -ldflags="-s -w" -o unvr-carousal .
+go build -ldflags="-s -w" -o ProtectView .
 
 # Raspberry Pi (cross-compile from x86_64)
-GOARCH=arm GOARM=6 GOOS=linux go build -o unvr-carousal-pi .
+GOARCH=arm GOARM=6 GOOS=linux go build -o ProtectView-pi .
 
 # Raspberry Pi 64-bit
-GOARCH=arm64 GOOS=linux go build -o unvr-carousal-pi64 .
+GOARCH=arm64 GOOS=linux go build -o ProtectView-pi64 .
 ```
 
 ## Run
 
 ```bash
 # First run (setup wizard)
-./unvr-carousal
+./ProtectView
 
 # With custom config path
-CONFIG_DIR=/custom/path ./unvr-carousal
+CONFIG_DIR=/custom/path ./ProtectView
 
 # Windowed mode (for testing)
-./unvr-carousal --windowed
+./ProtectView --windowed
 
 # Fullscreen (default)
-./unvr-carousal --fullscreen
+./ProtectView --fullscreen
 ```
 
 ## Pi Deployment
@@ -88,20 +88,20 @@ sudo apt install golang ffmpeg build-essential
 
 # Clone and build
 git clone <repo-url>
-cd unvr-carousal
-go build -ldflags="-s -w" -o unvr-carousal .
+cd ProtectView
+go build -ldflags="-s -w" -o ProtectView .
 
 # Create config directory
-mkdir -p ~/.config/unvr-carousal
+mkdir -p ~/.config/ProtectView
 
 # Run first time (setup wizard)
-./unvr-carousal
+./ProtectView
 ```
 
 ### Auto-Start (Systemd)
 
 ```bash
-sudo tee /etc/systemd/system/unvr-carousal.service << 'EOF'
+sudo tee /etc/systemd/system/ProtectView.service << 'EOF'
 [Unit]
 Description=UNVR Carousal
 After=graphical-session.target
@@ -109,7 +109,7 @@ After=graphical-session.target
 [Service]
 Type=simple
 User=pi
-ExecStart=/home/pi/unvr-carousal/unvr-carousal --fullscreen
+ExecStart=/home/pi/ProtectView/ProtectView --fullscreen
 Restart=on-failure
 RestartSec=5
 
@@ -117,8 +117,8 @@ RestartSec=5
 WantedBy=graphical-session.target
 EOF
 
-sudo systemctl enable unvr-carousal
-sudo systemctl start unvr-carousal
+sudo systemctl enable ProtectView
+sudo systemctl start ProtectView
 ```
 
 ### Kiosk Mode
@@ -128,7 +128,7 @@ Full lockdown: app is the only thing running, no TTY access, auto-restarts on ex
 **Setup** (one-time, requires sudo):
 
 ```bash
-sudo unvr-carousal --setup-kiosk
+sudo ProtectView --setup-kiosk
 ```
 
 This creates a `unvr-kiosk` user, configures autologin, disables TTY, and sets up a systemd guard. Reboot to enter kiosk mode.
@@ -136,7 +136,7 @@ This creates a `unvr-kiosk` user, configures autologin, disables TTY, and sets u
 **Undo** (requires sudo):
 
 ```bash
-sudo unvr-carousal --undo-kiosk
+sudo ProtectView --undo-kiosk
 ```
 
 Reverses all changes, removes kiosk user, restores normal boot.
@@ -166,12 +166,12 @@ sudo sed -i 's/ReserveVT=.*/ReserveVT=0/' /etc/systemd/logind.conf
 sudo mkdir -p /home/unvr-kiosk/.config/openbox
 sudo tee /home/unvr-kiosk/.config/openbox/autostart << 'EOF'
 xrandr --output HDMI-1 --mode 1920x1080
-unvr-carousal --kiosk
+ProtectView --kiosk
 EOF
 sudo chown -R unvr-kiosk:unvr-kiosk /home/unvr-kiosk/.config
 
 # Create systemd service
-sudo tee /etc/systemd/system/unvr-carousal.service << 'EOF'
+sudo tee /etc/systemd/system/ProtectView.service << 'EOF'
 [Unit]
 Description=UNVR Carousal Kiosk
 After=graphical.target
@@ -179,7 +179,7 @@ After=graphical.target
 [Service]
 Type=simple
 User=unvr-kiosk
-ExecStart=/usr/local/bin/unvr-carousal --kiosk
+ExecStart=/usr/local/bin/ProtectView --kiosk
 Restart=always
 RestartSec=1
 
@@ -187,7 +187,7 @@ RestartSec=1
 WantedBy=graphical.target
 EOF
 
-sudo systemctl enable unvr-carousal
+sudo systemctl enable ProtectView
 sudo systemctl enable lightdm
 ```
 

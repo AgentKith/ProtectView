@@ -28,6 +28,11 @@ EdgeMenu::EdgeMenu(QWidget *parent)
     connect(&hideTimer_, &QTimer::timeout, this, &EdgeMenu::hideMenu);
 }
 
+void EdgeMenu::setKioskMode(bool kiosk) {
+    exitButton_->setVisible(!kiosk);
+    fullscreenButton_->setVisible(!kiosk);
+}
+
 void EdgeMenu::showMenu() {
     show();
     hideTimer_.start();

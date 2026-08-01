@@ -24,8 +24,10 @@ private slots:
     void onEnterPressed();
 
 private:
+    void keyPressEvent(QKeyEvent *event) override;
     void setupUI();
     void shuffleButtons();
+    void appendDigit(int digit);
 
     QString expectedPin_;
     QString enteredPin_;

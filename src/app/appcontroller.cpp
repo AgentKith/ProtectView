@@ -12,10 +12,13 @@
 #include "unvr/client.h"
 #include "ui/setupwizard.h"
 #include "ui/mainwindow.h"
+#include "ui/settingsdialog.h"
+#include "ui/pinverifydialog.h"
 
-AppController::AppController(QObject *parent)
+AppController::AppController(bool kioskMode, QObject *parent)
     : QObject(parent),
       state_(State::NoConfig),
+      kioskMode_(kioskMode),
       client_(nullptr),
       manager_(nullptr),
       window_(nullptr) {
@@ -44,7 +47,6 @@ bool AppController::loadConfig() {
     QJsonDocument doc = QJsonDocument::fromJson(decrypted);
     config_ = AppConfig::fromJson(doc.object());
     if (config_.unvr.host.isEmpty()) {
-        qWarning() << "Config loaded but host is empty";
         return false;
     }
     return true;
@@ -65,7 +67,7 @@ void AppController::showWizard() {
         connectToUNVR();
     } else {
         QMessageBox::information(nullptr, "Setup Cancelled",
-                                 "Setup was cancelled. Please restart the application to configure.");
+                                  "Setup was cancelled. Please restart the application to configure.");
         QCoreApplication::quit();
     }
 }
@@ -92,6 +94,7 @@ void AppController::onCamerasLoaded(const QList<CameraInfo> &cameras) {
     manager_->setCameras(cameras);
 
     window_ = new MainWindow;
+    window_->setKioskMode(kioskMode_);
     for (int i = 0; i < manager_->cameraCount(); ++i) {
         window_->addCamera(manager_->cameraName(i));
     }
@@ -99,6 +102,7 @@ void AppController::onCamerasLoaded(const QList<CameraInfo> &cameras) {
     connect(manager_, &CameraManager::frameReady, window_, &MainWindow::setCameraFrame);
     connect(manager_, &CameraManager::errorOccurred, window_, &MainWindow::setCameraError);
     connect(window_, &MainWindow::retryCamera, this, &AppController::retryCamera);
+    connect(window_, &MainWindow::settingsRequested, this, &AppController::showSettingsDialog);
 
     window_->show();
     manager_->startAll();
@@ -115,12 +119,47 @@ void AppController::retryCamera(int index) {
     }
 }
 
+static int qualityIndex(const QString &q) {
+    if (q == "low") return 0;
+    if (q == "high") return 2;
+    return 1;
+}
+
+static QString qualityString(int idx) {
+    if (idx == 0) return "low";
+    if (idx == 2) return "high";
+    return "medium";
+}
+
 void AppController::showSettingsDialog() {
-    setState(State::Settings);
+    if (!config_.pinHash.isEmpty()) {
+        PINVerifyDialog pinDialog(config_.pinHash, window_);
+        if (pinDialog.exec() != QDialog::Accepted) {
+            return;
+        }
+    }
+
+    SettingsDialog dialog(window_);
+    dialog.loadFrom(config_.unvr.host, config_.unvr.apiKey, config_.video.ffmpegPath,
+                    qualityIndex(config_.video.quality),
+                    config_.unvr.tlsMode == TLSMode::Skip,
+                    5);
+    if (dialog.exec() == QDialog::Accepted) {
+        config_.unvr.host = dialog.unvrHost();
+        config_.unvr.apiKey = dialog.apiKey();
+        config_.video.ffmpegPath = dialog.ffmpegPath();
+        config_.video.quality = qualityString(dialog.videoQuality());
+        config_.unvr.tlsMode = dialog.skipTlsVerify() ? TLSMode::Skip : TLSMode::Verify;
+        saveConfig();
+    }
 }
 
 AppConfig AppController::getConfig() const {
     return config_;
+}
+
+void AppController::setConfig(const AppConfig &config) {
+    config_ = config;
 }
 
 MainWindow *AppController::getMainWindow() const {
@@ -139,7 +178,7 @@ void AppController::saveConfig() {
 }
 
 QString AppController::getConfigDir() const {
-    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/unvr-carousal";
+    return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/ProtectView";
 }
 
 QString AppController::getConfigPath() const {

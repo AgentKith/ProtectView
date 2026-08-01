@@ -1,8 +1,10 @@
 #include "pinpad.h"
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QKeyEvent>
 
 PINPad::PINPad(QWidget *parent)
     : QWidget(parent),
@@ -41,21 +43,21 @@ void PINPad::setupUI() {
     connect(enterButton_, &QPushButton::clicked, this, &PINPad::onEnterPressed);
 
     QGridLayout *grid = new QGridLayout;
-    int row = 0, col = 0;
-    for (int i = 0; i < digitButtons_.size(); ++i) {
+    for (int i = 0; i < 9; ++i) {
+        int row = i / 3;
+        int col = i % 3;
         grid->addWidget(digitButtons_[i], row, col);
-        col++;
-        if (col > 2) {
-            col = 0;
-            row++;
-        }
     }
-    grid->addWidget(clearButton_, row, 0);
-    grid->addWidget(enterButton_, row, 2);
+
+    QHBoxLayout *bottomRow = new QHBoxLayout;
+    bottomRow->addWidget(clearButton_);
+    bottomRow->addWidget(digitButtons_[9]);
+    bottomRow->addWidget(enterButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(display_);
     mainLayout->addLayout(grid);
+    mainLayout->addLayout(bottomRow);
     setLayout(mainLayout);
 }
 
@@ -82,8 +84,7 @@ QString PINPad::enteredPin() const {
 void PINPad::onDigitPressed() {
     QPushButton *btn = qobject_cast<QPushButton *>(sender());
     if (btn) {
-        enteredPin_.append(btn->text());
-        display_->setText(QString("●").repeated(enteredPin_.length()));
+        appendDigit(btn->text().toInt());
     }
 }
 
@@ -97,7 +98,31 @@ void PINPad::onEnterPressed() {
         emit pinAccepted();
     } else {
         emit pinRejected();
-        enteredPin_.clear();
-        display_->setText("");
     }
+    enteredPin_.clear();
+    display_->setText("");
+}
+
+void PINPad::keyPressEvent(QKeyEvent *event) {
+    if (event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) {
+        int digit = event->key() - Qt::Key_0;
+        appendDigit(digit);
+    } else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        onEnterPressed();
+    } else if (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete) {
+        if (!enteredPin_.isEmpty()) {
+            enteredPin_.chop(1);
+            display_->setText(QString("●").repeated(enteredPin_.length()));
+        }
+    } else if (event->key() == Qt::Key_Escape) {
+        onClearPressed();
+    } else {
+        QWidget::keyPressEvent(event);
+    }
+}
+
+void PINPad::appendDigit(int digit) {
+    if (enteredPin_.length() >= 6) return;
+    enteredPin_.append(QString::number(digit));
+    display_->setText(QString("●").repeated(enteredPin_.length()));
 }

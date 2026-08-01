@@ -49,6 +49,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     connect(cancelButton_, &QPushButton::clicked, this, &QDialog::reject);
 }
 
+void SettingsDialog::loadFrom(const QString &host, const QString &apiKey, const QString &ffmpegPath,
+                              int quality, bool skipTls, int retryInterval) {
+    hostEdit_->setText(host);
+    apiKeyEdit_->setText(apiKey);
+    ffmpegPathEdit_->setText(ffmpegPath);
+    qualityCombo_->setCurrentIndex(quality);
+    skipTlsCheck_->setChecked(skipTls);
+    retryIntervalEdit_->setValue(retryInterval);
+}
+
 QString SettingsDialog::unvrHost() const {
     return hostEdit_->text();
 }

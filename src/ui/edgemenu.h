@@ -9,6 +9,7 @@ class EdgeMenu : public QWidget {
     Q_OBJECT
 public:
     explicit EdgeMenu(QWidget *parent = nullptr);
+    void setKioskMode(bool kiosk);
     void showMenu();
     void hideMenu();
     bool isVisible() const;

@@ -21,15 +21,19 @@ public:
         Connected
     };
 
-    explicit AppController(QObject *parent = nullptr);
+    explicit AppController(bool kioskMode = false, QObject *parent = nullptr);
 
     void initialize();
     State getState() const;
     AppConfig getConfig() const;
+    void setConfig(const AppConfig &config);
     MainWindow *getMainWindow() const;
 
     void retryCamera(int index);
     void showSettingsDialog();
+
+    bool loadConfig();
+    void saveConfig();
 
 signals:
     void stateChanged(State state);
@@ -40,10 +44,8 @@ private slots:
     void onStreamCreated(const StreamResponse &response);
 
 private:
-    bool loadConfig();
     void showWizard();
     void showSettings();
-    void saveConfig();
     void connectToUNVR();
     QString getConfigDir() const;
     QString getConfigPath() const;
@@ -51,6 +53,7 @@ private:
 
     State state_;
     AppConfig config_;
+    bool kioskMode_;
     UNVRClient *client_;
     CameraManager *manager_;
     QPointer<MainWindow> window_;

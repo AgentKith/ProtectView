@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-APP_NAME="unvr-carousal"
+APP_NAME="ProtectView"
 APP_USER="unvr-kiosk"
 
 if [ "$(id -u)" -ne 0 ]; then

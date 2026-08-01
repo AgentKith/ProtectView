@@ -1,4 +1,4 @@
-# unvr-carousal
+# ProtectView
 
 Multi-camera security monitor for UniFi UNVR. Displays live camera feeds in a fullscreen grid layout with PIN-protected settings.
 
@@ -23,9 +23,9 @@ Multi-camera security monitor for UniFi UNVR. Displays live camera feeds in a fu
 
 ```bash
 git clone <repo-url>
-cd unvr-carousal
-go build -o unvr-carousal .
-./unvr-carousal
+cd ProtectView
+go build -o ProtectView .
+./ProtectView
 ```
 
 First run launches the setup wizard: UNVR host → API key → set PIN → done.

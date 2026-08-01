@@ -6,10 +6,10 @@ cmake-build-*/
 *.a
 
 # Binaries
-unvr-carousal
+protectview
 
 # Config
-~/.config/unvr-carousal/
+~/.config/protectview/
 
 # IDE
 .vscode/
@@ -30,3 +30,5 @@ coverage/
 
 # Temp
 tmp/
+Testing/
+

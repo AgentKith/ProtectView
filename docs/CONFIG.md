@@ -3,7 +3,7 @@
 ## File Location
 
 ```
-~/.config/unvr-carousal/
+~/.config/ProtectView/
 ├── config.enc    # AES-256-GCM encrypted JSON
 └── .salt         # 16-byte random salt (hex-encoded)
 ```

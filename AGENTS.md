@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**unvr-carousal** is a multi-camera security monitor for UniFi UNVR. Displays live camera feeds in a fullscreen grid layout with PIN-protected settings.
+**ProtectView** is a multi-camera security monitor for UniFi UNVR. Displays live camera feeds in a fullscreen grid layout with PIN-protected settings.
 
 **Platforms**: Linux only (desktop + Raspberry Pi). No Windows support.
 **GUI**: Fyne (`fyne.io/fyne/v2`)
@@ -32,7 +32,7 @@
 - Simple, works, no OpenGL complexity
 
 ### Config Storage
-- `~/.config/unvr-carousal/config.enc`
+- `~/.config/ProtectView/config.enc`
 - AES-256-GCM encrypted, key derived from device fingerprint via `argon2id`
 - Pi fingerprint: `/proc/cpuinfo` Serial
 - Android fingerprint: `Settings.Secure.ANDROID_ID` (future)

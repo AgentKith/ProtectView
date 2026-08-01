@@ -1,9 +1,9 @@
 #!/bin/bash
 set -eo pipefail
 
-APP_NAME="unvr-carousal"
+APP_NAME="ProtectView"
 APP_USER="unvr-kiosk"
-APP_BIN="${1:-/usr/local/bin/unvr-carousal}"
+APP_BIN="${1:-/usr/local/bin/protectview}"
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "Error: This script must be run as root" >&2

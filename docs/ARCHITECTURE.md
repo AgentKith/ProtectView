@@ -86,7 +86,7 @@ UNVR ──RTSPS──▶ FFmpeg ──rawvideo──▶ Goroutine ──image.R
 ## Config Storage
 
 ```
-~/.config/unvr-carousal/
+~/.config/ProtectView/
 ├── config.enc          # AES-256-GCM encrypted JSON
 └── .salt               # 16-byte random salt (per-device)
 ```
@@ -115,7 +115,7 @@ UNVR ──RTSPS──▶ FFmpeg ──rawvideo──▶ Goroutine ──image.R
 2. Configure LightDM autologin for `unvr-kiosk`
 3. Disable TTY access (`NAutoVTs=0`, `ReserveVT=0` in `logind.conf`)
 4. Create systemd service (`Restart=always`, `RestartSec=1`)
-5. Install openbox autostart (only launches `unvr-carousal --kiosk`)
+5. Install openbox autostart (only launches `ProtectView --kiosk`)
 6. Drop privileges, exit
 
 ### Undo Flow (`--undo-kiosk`, requires sudo)

@@ -1,4 +1,4 @@
-qt_add_executable(unvr-carousal
+qt_add_executable(protectview
     main.cpp
 
     app/config.h app/config.cpp
@@ -6,6 +6,7 @@ qt_add_executable(unvr-carousal
     app/fingerprint.h app/fingerprint.cpp
     app/appcontroller.h app/appcontroller.cpp
     app/cameramanager.h app/cameramanager.cpp
+    app/kiosk.h app/kiosk.cpp
 
     unvr/types.h unvr/types.cpp
     unvr/client.h unvr/client.cpp
@@ -21,6 +22,7 @@ qt_add_executable(unvr-carousal
     ui/cameratilewidget.h ui/cameratilewidget.cpp
     ui/settingsdialog.h ui/settingsdialog.cpp
     ui/pinpad.h ui/pinpad.cpp
+    ui/pinverifydialog.h ui/pinverifydialog.cpp
     ui/edgemenu.h ui/edgemenu.cpp
 
     resources/fonts.qrc
@@ -28,9 +30,10 @@ qt_add_executable(unvr-carousal
     resources/kiosk.qrc
 )
 
-target_include_directories(unvr-carousal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(protectview PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(unvr-carousal PRIVATE
+target_link_libraries(protectview PRIVATE
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::OpenGLWidgets
     OpenSSL::SSL OpenSSL::Crypto
+    X11::X11
 )
