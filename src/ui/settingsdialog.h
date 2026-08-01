@@ -24,6 +24,10 @@ public:
 signals:
     void settingsChanged();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
 private:
     QLineEdit *hostEdit_;
     QLineEdit *apiKeyEdit_;

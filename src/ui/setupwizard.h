@@ -18,6 +18,8 @@
 #include <QSslSocket>
 #include <QCryptographicHash>
 #include <QRegularExpressionValidator>
+#include <QShowEvent>
+#include <QHideEvent>
 #include "app/config.h"
 
 class ConnectionPage : public QWizardPage {
@@ -83,6 +85,10 @@ public:
     QString getPinHash() const;
     TLSMode getTlsMode() const;
     QString getTlsFingerprint() const;
+
+protected:
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 private:
     QString host_;

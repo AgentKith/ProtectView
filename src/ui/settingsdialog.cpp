@@ -4,6 +4,8 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QGraphicsDropShadowEffect>
+#include <QShowEvent>
+#include <QHideEvent>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent),
@@ -13,8 +15,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
       qualityCombo_(new QComboBox),
       skipTlsCheck_(new QCheckBox),
       retryIntervalEdit_(new QSpinBox),
-      saveButton_(new QPushButton("Save")),
-      cancelButton_(new QPushButton("Cancel")) {
+    saveButton_(new QPushButton("Save")),
+       cancelButton_(new QPushButton("Cancel")) {
     setObjectName("SettingsDialog");
     setWindowTitle("Settings");
 
@@ -33,6 +35,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     retryIntervalEdit_->setValue(5);
     retryIntervalEdit_->setSuffix("s");
 
+    saveButton_->setObjectName("saveButton");
+    cancelButton_->setObjectName("cancelButton");
+
     QFormLayout *form = new QFormLayout;
     form->addRow("UNVR Host:", hostEdit_);
     form->addRow("API Key:", apiKeyEdit_);
@@ -41,24 +46,13 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     form->addRow("Skip TLS Verify:", skipTlsCheck_);
     form->addRow("Retry Interval:", retryIntervalEdit_);
 
-    QWidget *buttonPanel = new QWidget;
-    buttonPanel->setObjectName("FrostedPanel");
-    {
-        QGraphicsDropShadowEffect *panelGlow = new QGraphicsDropShadowEffect(buttonPanel);
-        panelGlow->setColor(QColor(255, 107, 0));
-        panelGlow->setBlurRadius(30);
-        panelGlow->setOffset(0, 0);
-        buttonPanel->setGraphicsEffect(panelGlow);
-    }
-
-    QHBoxLayout *buttons = new QHBoxLayout(buttonPanel);
-    buttons->addStretch();
-    buttons->addWidget(saveButton_);
+    QHBoxLayout *buttons = new QHBoxLayout;
     buttons->addWidget(cancelButton_);
+    buttons->addWidget(saveButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(form);
-    mainLayout->addWidget(buttonPanel);
+    mainLayout->addLayout(buttons);
     setLayout(mainLayout);
 
     connect(saveButton_, &QPushButton::clicked, this, [this]() {
@@ -66,6 +60,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
         accept();
     });
     connect(cancelButton_, &QPushButton::clicked, this, &QDialog::reject);
+}
+
+void SettingsDialog::showEvent(QShowEvent *event) {
+    if (parentWidget()) parentWidget()->clearFocus();
+    QDialog::showEvent(event);
+}
+
+void SettingsDialog::hideEvent(QHideEvent *event) {
+    clearFocus();
+    QDialog::hideEvent(event);
 }
 
 void SettingsDialog::loadFrom(const QString &host, const QString &apiKey, const QString &ffmpegPath,

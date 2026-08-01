@@ -4,6 +4,12 @@
 #include <QLabel>
 #include <QCryptographicHash>
 #include <QGraphicsDropShadowEffect>
+#include <QPainter>
+#include <QShowEvent>
+#include <QHideEvent>
+#include <QGraphicsBlurEffect>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
 
 PINVerifyDialog::PINVerifyDialog(const QString &pinHash, QWidget *parent)
     : QDialog(parent),
@@ -34,6 +40,37 @@ PINVerifyDialog::PINVerifyDialog(const QString &pinHash, QWidget *parent)
 
     connect(pinPad_, &PINPad::pinSubmitted, this, &PINVerifyDialog::onPinSubmitted);
     connect(pinPad_, &PINPad::pinDismissed, this, &QDialog::reject);
+}
+
+void PINVerifyDialog::showEvent(QShowEvent *event) {
+    if (parentWidget()) parentWidget()->clearFocus();
+    QDialog::showEvent(event);
+    if (parentWidget()) {
+        QPixmap src = parentWidget()->grab();
+        QGraphicsScene scene;
+        QGraphicsPixmapItem *item = scene.addPixmap(src);
+        QGraphicsBlurEffect *blur = new QGraphicsBlurEffect(this);
+        blur->setBlurRadius(20);
+        item->setGraphicsEffect(blur);
+        blurredBackground_ = QPixmap(src.size());
+        blurredBackground_.fill(Qt::transparent);
+        QPainter painter(&blurredBackground_);
+        scene.render(&painter);
+    }
+}
+
+void PINVerifyDialog::hideEvent(QHideEvent *event) {
+    clearFocus();
+    QDialog::hideEvent(event);
+}
+
+void PINVerifyDialog::paintEvent(QPaintEvent *event) {
+    QDialog::paintEvent(event);
+    if (!blurredBackground_.isNull()) {
+        QPainter painter(this);
+        painter.drawPixmap(0, 0, width(), height(), blurredBackground_);
+        painter.fillRect(rect(), QColor(0, 0, 0, 153));
+    }
 }
 
 void PINVerifyDialog::onPinSubmitted(const QString &pin) {

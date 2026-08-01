@@ -3,6 +3,8 @@
 #include <QFile>
 #include <QRandomGenerator>
 #include <QGraphicsDropShadowEffect>
+#include <QShowEvent>
+#include <QHideEvent>
 
 // ConnectionPage
 
@@ -443,4 +445,14 @@ TLSMode SetupWizard::getTlsMode() const {
 
 QString SetupWizard::getTlsFingerprint() const {
     return tlsFingerprint_;
+}
+
+void SetupWizard::showEvent(QShowEvent *event) {
+    if (parentWidget()) parentWidget()->clearFocus();
+    QWizard::showEvent(event);
+}
+
+void SetupWizard::hideEvent(QHideEvent *event) {
+    clearFocus();
+    QWizard::hideEvent(event);
 }

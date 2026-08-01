@@ -270,11 +270,9 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: none;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 16px solid #FF6B00;
-    margin-right: 24px;
+    image: url(:/chevron-down.svg);
+    width: 24px;
+    height: 24px;
 }
 
 QComboBox QAbstractItemView {
@@ -316,17 +314,15 @@ QSpinBox::down-button {
 }
 
 QSpinBox::up-arrow {
-    image: none;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 16px solid #FF6B00;
+    image: url(:/chevron-up.svg);
+    width: 24px;
+    height: 24px;
 }
 
 QSpinBox::down-arrow {
-    image: none;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-top: 16px solid #FF6B00;
+    image: url(:/chevron-down.svg);
+    width: 24px;
+    height: 24px;
 }
 
 /* ---------- QCheckBox ---------- */
@@ -455,12 +451,13 @@ QScrollBar::sub-page:horizontal {
     color: #66E6FF;
 }
 
-/* ---------- Frosted Panel (button container) ---------- */
-#FrostedPanel {
-    background-color: rgba(26, 26, 26, 0.85);
-    border: 2px solid rgba(255, 107, 0, 0.5);
-    border-radius: 32px;
-    padding: 32px;
+/* ---------- Settings buttons (Save, Cancel) ---------- */
+QPushButton#saveButton,
+QPushButton#cancelButton {
+    font-size: 40px;
+    padding: 24px 48px;
+    min-width: 160px;
+    min-height: 80px;
 }
 
 /* ---------- PIN Display ---------- */

@@ -9,6 +9,7 @@ class FFmpegPlayer : public VideoPlayer {
     Q_OBJECT
 public:
     explicit FFmpegPlayer(const QString &streamUrl, QObject *parent = nullptr);
+    ~FFmpegPlayer() override;
     void start() override;
     void stop() override;
 

@@ -57,7 +57,6 @@ void CameraManager::stopCamera(int index) {
     if (index < 0 || index >= players_.size()) return;
     if (players_[index]) {
         players_[index]->stop();
-        players_[index]->deleteLater();
         players_[index] = nullptr;
     }
 }

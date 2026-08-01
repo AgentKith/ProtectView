@@ -28,11 +28,17 @@ void FFmpegPlayer::start() {
 }
 
 void FFmpegPlayer::stop() {
+    if (ffmpeg_.state() == QProcess::NotRunning) return;
     ffmpeg_.terminate();
     ffmpeg_.waitForFinished(3000);
     if (ffmpeg_.state() != QProcess::NotRunning) {
         ffmpeg_.kill();
+        ffmpeg_.waitForFinished(1000);
     }
+}
+
+FFmpegPlayer::~FFmpegPlayer() {
+    stop();
 }
 
 void FFmpegPlayer::onReadyRead() {

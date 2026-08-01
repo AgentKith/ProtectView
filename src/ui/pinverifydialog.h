@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QString>
+#include <QPixmap>
 
 class PINPad;
 
@@ -15,6 +16,11 @@ public:
 signals:
     void verified();
 
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+
 private:
     bool verifyPin(const QString &enteredPin) const;
     void onPinSubmitted(const QString &pin);
@@ -23,4 +29,5 @@ private:
     QString pinHash_;
     bool verified_;
     QLabel *errorLabel_;
+    QPixmap blurredBackground_;
 };
