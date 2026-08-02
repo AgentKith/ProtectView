@@ -9,6 +9,7 @@ cmake-build-*/
 protectview
 
 # Config
+.env
 ~/.config/protectview/
 
 # IDE

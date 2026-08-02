@@ -111,12 +111,17 @@ Dynamic styles (inline, for runtime state changes):
 | `exit` | Exit button |
 | `retry` | Retry, reconnect |
 | `camera` | Camera icon |
+| `check` | Confirmation |
+| `clear` | Clear action |
+| `enter` | Submit action |
+| `chevron-down` | Dropdown indicator |
+| `chevron-up` | Dropdown indicator |
 
 ## UI Screens
 
 ### Main Feed
 
-- Fullscreen grid of camera tiles
+- Fullscreen grid of camera tiles (`QGridLayout`)
 - Each tile: custom `paintEvent` with camera frame or error overlay
 - Tile spacing: 8px gaps
 - Error state: dark tile (`#1A1A1A`), camera name + error message centered, error color (`#EF4444`), font size 28px SemiBold
@@ -129,7 +134,7 @@ Dynamic styles (inline, for runtime state changes):
 - Background: `rgba(10, 10, 10, 230)`, neon orange border, 24px border radius
 - Buttons: cyan borders (`#00D4FF`), 36px font, 24px padding
 - Auto-hide after 3s
-- Items (vertical): settings, fullscreen toggle, exit
+- Items (vertical): settings, exit
 
 ### Settings Panel
 
@@ -174,6 +179,7 @@ Dynamic styles (inline, for runtime state changes):
 - Fullscreen only, no toggle
 - Window close event is ignored (prevents quit)
 - Edge-hover menu disabled (no exit option)
+- X11 key grabs: Alt+Tab, PrintScreen, Super key
 - Systemd guard restarts on any exit
 
 ## Animations

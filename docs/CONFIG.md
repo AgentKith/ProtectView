@@ -4,22 +4,21 @@
 
 ```
 ~/.config/ProtectView/
-├── config.enc    # AES-256-GCM encrypted JSON
-└── .salt         # 16-byte random salt (hex-encoded)
+└── config.enc    # AES-256-GCM encrypted JSON
 ```
 
 ## Encryption
 
 ### Algorithm
 
-- **Cipher**: AES-256-GCM
+- **Cipher**: AES-256-GCM (OpenSSL)
 - **Key derivation**: argon2id
 - **Key length**: 32 bytes (256 bits)
 - **Nonce**: 12 bytes, random per encryption
 
 ### Key Derivation
 
-```
+```cpp
 key = argon2id(
     password: device_fingerprint,
     salt: file_salt,
@@ -36,11 +35,10 @@ key = argon2id(
 |----------|--------|---------|
 | Raspberry Pi | `/proc/cpuinfo` Serial | `10000000e1234567` |
 | Linux Desktop | `/etc/machine-id` | `abcd1234efgh5678ijkl9012mnop3456` |
-| Android | `Settings.Secure.ANDROID_ID` | `9774d56d682e549c` |
 
 ### Salt Generation
 
-On first run, generate 16 random bytes, save as hex-encoded string in `.salt` file.
+On first run, `Storage` generates 16 random bytes, saves as hex-encoded string in `.salt` file within the config directory.
 
 ## Config Schema
 
@@ -52,39 +50,24 @@ On first run, generate 16 random bytes, save as hex-encoded string in `.salt` fi
     "unvr": {
         "host": "192.168.1.100",
         "port": 443,
-        "tls_mode": "fingerprint",
-        "tls_fingerprint": "aa:bb:cc:dd:ee:ff:00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff",
-        "api_key": "your-api-key-here"
+        "tlsMode": "Verify",
+        "tlsFingerprint": "",
+        "apiKey": "your-api-key-here"
     },
-    "pin": {
-        "hash": "$2a$12$..."
-    },
+    "pinHash": "$2a$12$...",
     "video": {
-        "mode": "per-camera",
-        "ffmpeg_path": "",
+        "mode": "PerCamera",
+        "ffmpegPath": "",
         "quality": "medium"
     },
     "layout": {
-        "mode": "auto",
+        "mode": "Auto",
         "rows": 0,
         "cols": 0,
-        "cameras": [
-            {
-                "id": "camera-uuid-1",
-                "name": "Front Door",
-                "enabled": true,
-                "quality": "high"
-            },
-            {
-                "id": "camera-uuid-2",
-                "name": "Back Yard",
-                "enabled": true,
-                "quality": "medium"
-            }
-        ]
+        "cameras": []
     },
     "appearance": {
-        "theme": "dark",
+        "theme": "System",
         "fullscreen": true,
         "kiosk": false
     }
@@ -97,73 +80,89 @@ On first run, generate 16 random bytes, save as hex-encoded string in `.salt` fi
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `unvr.host` | string | — | UNVR IP address or hostname |
+| `unvr.host` | QString | — | UNVR IP address or hostname |
 | `unvr.port` | int | `443` | UNVR port |
-| `unvr.tls_mode` | string | `fingerprint` | `skip` or `fingerprint` |
-| `unvr.tls_fingerprint` | string | — | SHA-256 fingerprint of UNVR cert (22 hex bytes, colon-separated) |
-| `unvr.api_key` | string | — | UniFi Protect API key |
+| `unvr.tlsMode` | TLSMode | `Verify` | `Verify`, `Skip`, or `Fingerprint` |
+| `unvr.tlsFingerprint` | QString | — | SHA-256 fingerprint of UNVR cert |
+| `unvr.apiKey` | QString | — | UniFi Protect API key |
 
 ### PIN
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `pin.hash` | string | bcrypt hash of 6-digit PIN |
+| `pinHash` | QString | bcrypt hash of 6-digit PIN |
 
 ### Video
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `video.mode` | string | `per-camera` | `per-camera`, `composite`, `snapshot`, `relay` |
-| `video.ffmpeg_path` | string | `` | Custom FFmpeg path (empty = use PATH) |
-| `video.quality` | string | `medium` | Default quality: `high`, `medium`, `low` |
+| `video.mode` | VideoMode | `PerCamera` | `PerCamera`, `Composite`, or `Snapshot` |
+| `video.ffmpegPath` | QString | `` | Custom FFmpeg path (empty = use PATH) |
+| `video.quality` | QString | `medium` | Default quality: `high`, `medium`, `low` |
 
 ### Layout
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `layout.mode` | string | `auto` | `auto` or `custom` |
-| `layout.rows` | int | `0` | Custom rows (ignored if mode=auto) |
-| `layout.cols` | int | `0` | Custom cols (ignored if mode=auto) |
-| `layout.cameras` | array | — | Ordered list of camera configs |
-
-### Camera Entry
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `id` | string | — | UNVR camera UUID |
-| `name` | string | — | Camera display name |
-| `enabled` | bool | `true` | Whether to show this camera |
-| `quality` | string | `medium` | Per-camera quality: `high`, `medium`, `low` |
+| `layout.mode` | LayoutMode | `Auto` | `Auto` or `Custom` |
+| `layout.rows` | int | `0` | Custom rows (ignored if mode=Auto) |
+| `layout.cols` | int | `0` | Custom cols (ignored if mode=Auto) |
+| `layout.cameras` | QStringList | — | Ordered list of camera IDs to display |
 
 ### Appearance
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `appearance.theme` | string | `dark` | `dark` or `light` |
+| `appearance.theme` | ThemeMode | `System` | `System`, `Light`, or `Dark` |
 | `appearance.fullscreen` | bool | `true` | Start in fullscreen mode |
 | `appearance.kiosk` | bool | `false` | Kiosk mode (no decorations, prevent close) |
 
+## Enum Values
+
+### VideoMode
+- `PerCamera` — one FFmpeg subprocess per camera
+- `Composite` — single FFmpeg with filter_complex grid
+- `Snapshot` — HTTP snapshot polling
+
+### TLSMode
+- `Verify` — standard TLS verification (default)
+- `Skip` — skip certificate verification
+- `Fingerprint` — verify against stored SHA-256 fingerprint
+
+### LayoutMode
+- `Auto` — calculate optimal grid from camera count + screen aspect
+- `Custom` — use user-specified rows/cols
+
+### ThemeMode
+- `System` — follow system theme
+- `Light` — force light theme
+- `Dark` — force dark theme
+
 ## Migration
 
-Config version field (`version`) enables future migrations:
+Config version field (`version`) enables future migrations. `AppConfig::fromJson()` checks version and applies transformations as needed:
 
-```go
-func loadConfig() (*Config, error) {
-    cfg, err := decryptAndLoad()
-    if err != nil {
-        return nil, err
-    }
+```cpp
+AppConfig AppConfig::fromJson(const QJsonObject &obj) {
+    AppConfig config;
+    config.version = obj.value("version", 0).toInt();
 
-    switch cfg.Version {
+    // Apply version-specific migrations
+    switch (config.version) {
     case 1:
-        return cfg, nil
+        // Current schema
+        break;
     case 0:
-        // Migrate from v0 to v1
-        cfg.Version = 1
+        // Legacy schema migration
+        config.version = 1;
         // ... migration logic ...
-        return cfg, saveConfig(cfg)
+        break;
     default:
-        return nil, fmt.Errorf("unsupported config version: %d", cfg.Version)
+        qWarning() << "Unsupported config version:" << config.version;
     }
+
+    // Parse fields
+    // ...
+    return config;
 }
 ```

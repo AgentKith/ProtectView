@@ -41,7 +41,6 @@ signals:
 
 private slots:
     void onCamerasLoaded(const QList<CameraInfo> &cameras);
-    void onStreamCreated(const StreamResponse &response);
 
 private:
     void showWizard();

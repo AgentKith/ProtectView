@@ -109,10 +109,6 @@ void AppController::onCamerasLoaded(const QList<CameraInfo> &cameras) {
     emit camerasLoaded(window_);
 }
 
-void AppController::onStreamCreated(const StreamResponse &response) {
-    Q_UNUSED(response);
-}
-
 void AppController::retryCamera(int index) {
     if (manager_) {
         manager_->startCamera(index);

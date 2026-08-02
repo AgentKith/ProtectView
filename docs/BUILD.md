@@ -4,31 +4,33 @@
 
 ### Linux Desktop / Raspberry Pi
 
-- **Go** 1.21+
+- **CMake** 3.24+
+- **Qt6** (Core, Gui, Widgets, Network, Multimedia, Test, OpenGLWidgets, Svg)
+- **OpenSSL** (development headers)
 - **FFmpeg** (installed and in PATH)
-- **C compiler** (gcc or clang, for CGO if needed)
-- **Fyne GUI dependencies** (GL, GLFW, Wayland/X11)
+- **libX11** (development headers)
+- **C++20 compiler** (GCC 11+ or Clang 14+)
 
 ```bash
 # Ubuntu/Debian
-sudo apt install golang ffmpeg build-essential \
-  libgl1-mesa-dev libglu1-mesa-dev libwayland-dev libx11-dev \
-  libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev \
-  libxkbcommon-dev libxxf86vm-dev
+sudo apt install cmake g++ build-essential \
+  qt6-base-dev qt6-multimedia-dev qt6-svg-dev \
+  libssl-dev libx11-dev \
+  ffmpeg
 
 # Raspberry Pi OS
-sudo apt install golang ffmpeg build-essential \
-  libgl1-mesa-dev libglu1-mesa-dev libwayland-dev libx11-dev \
-  libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev \
-  libxkbcommon-dev libxxf86vm-dev
+sudo apt install cmake g++ build-essential \
+  qt6-base-dev qt6-multimedia-dev qt6-svg-dev \
+  libssl-dev libx11-dev \
+  ffmpeg
 ```
 
 ### Verify Installation
 
 ```bash
-go version    # go1.21.0 or later
-ffmpeg -version  # 4.2 or later
-gcc --version  # any version
+cmake --version    # 3.24 or later
+g++ --version      # 11+ or clang 14+
+ffmpeg -version    # 4.2 or later
 ```
 
 ## Build
@@ -38,43 +40,46 @@ gcc --version  # any version
 git clone <repo-url>
 cd ProtectView
 
-# Download dependencies
-go mod tidy
+# Configure
+cmake -B build
 
 # Build
-go build -o ProtectView .
+cmake --build build
 
 # Run
-./ProtectView
+./build/src/protectview
 ```
 
 ## Build Flags
 
 ```bash
-# Release build (strip debug info, smaller binary)
-go build -ldflags="-s -w" -o ProtectView .
+# Release build
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 
-# Raspberry Pi (cross-compile from x86_64)
-GOARCH=arm GOARM=6 GOOS=linux go build -o ProtectView-pi .
+# Debug build
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
 
-# Raspberry Pi 64-bit
-GOARCH=arm64 GOOS=linux go build -o ProtectView-pi64 .
+# With code coverage
+cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=ON
+cmake --build build
 ```
 
 ## Run
 
 ```bash
 # First run (setup wizard)
-./ProtectView
+./build/src/protectview
 
-# With custom config path
-CONFIG_DIR=/custom/path ./ProtectView
+# Kiosk mode
+./build/src/protectview --kiosk
 
-# Windowed mode (for testing)
-./ProtectView --windowed
+# Setup kiosk (requires sudo)
+sudo ./build/src/protectview --setup-kiosk
 
-# Fullscreen (default)
-./ProtectView --fullscreen
+# Undo kiosk (requires sudo)
+sudo ./build/src/protectview --undo-kiosk
 ```
 
 ## Pi Deployment
@@ -84,18 +89,18 @@ CONFIG_DIR=/custom/path ./ProtectView
 ```bash
 # Install dependencies
 sudo apt update
-sudo apt install golang ffmpeg build-essential
+sudo apt install cmake g++ build-essential \
+  qt6-base-dev qt6-multimedia-dev qt6-svg-dev \
+  libssl-dev libx11-dev ffmpeg
 
 # Clone and build
 git clone <repo-url>
 cd ProtectView
-go build -ldflags="-s -w" -o ProtectView .
-
-# Create config directory
-mkdir -p ~/.config/ProtectView
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 
 # Run first time (setup wizard)
-./ProtectView
+./build/src/protectview
 ```
 
 ### Auto-Start (Systemd)
@@ -103,13 +108,13 @@ mkdir -p ~/.config/ProtectView
 ```bash
 sudo tee /etc/systemd/system/ProtectView.service << 'EOF'
 [Unit]
-Description=UNVR Carousal
+Description=UNVR Camera Monitor
 After=graphical-session.target
 
 [Service]
 Type=simple
 User=pi
-ExecStart=/home/pi/ProtectView/ProtectView --fullscreen
+ExecStart=/home/pi/ProtectView/build/src/protectview
 Restart=on-failure
 RestartSec=5
 
@@ -128,7 +133,7 @@ Full lockdown: app is the only thing running, no TTY access, auto-restarts on ex
 **Setup** (one-time, requires sudo):
 
 ```bash
-sudo ProtectView --setup-kiosk
+sudo ./build/src/protectview --setup-kiosk
 ```
 
 This creates a `unvr-kiosk` user, configures autologin, disables TTY, and sets up a systemd guard. Reboot to enter kiosk mode.
@@ -136,7 +141,7 @@ This creates a `unvr-kiosk` user, configures autologin, disables TTY, and sets u
 **Undo** (requires sudo):
 
 ```bash
-sudo ProtectView --undo-kiosk
+sudo ./build/src/protectview --undo-kiosk
 ```
 
 Reverses all changes, removes kiosk user, restores normal boot.
@@ -173,13 +178,13 @@ sudo chown -R unvr-kiosk:unvr-kiosk /home/unvr-kiosk/.config
 # Create systemd service
 sudo tee /etc/systemd/system/ProtectView.service << 'EOF'
 [Unit]
-Description=UNVR Carousal Kiosk
+Description=UNVR Camera Monitor Kiosk
 After=graphical.target
 
 [Service]
 Type=simple
 User=unvr-kiosk
-ExecStart=/usr/local/bin/ProtectView --kiosk
+ExecStart=/usr/local/bin/protectview --kiosk
 Restart=always
 RestartSec=1
 
@@ -220,6 +225,16 @@ which ffmpeg
 
 # If not, specify path in settings or install:
 sudo apt install ffmpeg
+```
+
+### Qt6 Not Found
+
+```bash
+# Install Qt6 development packages
+sudo apt install qt6-base-dev qt6-multimedia-dev qt6-svg-dev
+
+# If CMake can't find Qt6, set CMAKE_PREFIX_PATH:
+cmake -B build -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt6
 ```
 
 ### RTSPS Connection Failed

@@ -26,7 +26,7 @@ API keys are generated in UniFi Protect web interface: Settings > System > API A
 GET /v1/cameras
 ```
 
-**Response**: Array of camera objects.
+**Response**: Array of camera objects (or `{"cameras": [...]}` wrapper).
 
 ```json
 [
@@ -60,7 +60,7 @@ POST /v1/cameras/{id}/rtsps-stream
 
 ```json
 {
-    "quality": "high"
+    "qualities": ["high"]
 }
 ```
 
@@ -70,12 +70,10 @@ POST /v1/cameras/{id}/rtsps-stream
 
 ```json
 {
-    "urls": {
-        "high": "rtsps://...",
-        "medium": "rtsps://...",
-        "low": "rtsps://..."
-    },
-    "expiresAt": 1690000000
+    "high": "rtsps://...",
+    "medium": "rtsps://...",
+    "low": "rtsps://...",
+    "package": "rtsps://..."
 }
 ```
 
@@ -137,8 +135,9 @@ GET /v1/nvr
 UNVR presents a self-signed certificate by default.
 
 Options:
-1. **Skip verification**: Accept any certificate (less secure)
-2. **Fingerprint verification**: Compare certificate SHA-256 fingerprint
+1. **Verify** (default): Standard TLS verification
+2. **Skip verification**: Accept any certificate (less secure)
+3. **Fingerprint verification**: Compare certificate SHA-256 fingerprint
 
 Get fingerprint:
 
